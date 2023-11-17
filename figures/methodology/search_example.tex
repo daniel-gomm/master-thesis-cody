@@ -1,0 +1,119 @@
+\begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    % TikZ code for the first graph
+    \begin{tikzpicture}[node distance={15mm}, main/.style = {draw, circle}]
+        \node[main,ultra thick] (1) {$n_{root}$};
+        
+        \node[draw, rectangle, below=1mm of 1] {\footnotesize $prediction_{root} = 3.179$};
+    \end{tikzpicture}
+    \caption{Iteration $1$}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    % TikZ code for the second graph
+   \begin{tikzpicture}[node distance={15mm}, main/.style = {draw, circle}]
+        \node[main] (1) {$n_{root}$};
+        \node[main, ultra thick] (22) [below of=1] {$n_2$};
+        \node[main] (21) [left of=22] {$n_1$};
+        \node[main] (23) [right of=22] {$n_3$};
+
+        \node[draw, rectangle, below=1mm of 22] {\footnotesize $prediction_{2} = 0.731$};
+        
+        \draw[-stealth] (1) -- (21);
+        \draw[-stealth, ultra thick] (1) -- (22);
+        \draw[-stealth] (1) -- (23);
+    \end{tikzpicture}
+    \caption{Iteration $2$}
+\end{subfigure}
+\par\bigskip
+\begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    % TikZ code for the first graph
+    \begin{tikzpicture}[node distance={15mm}, main/.style = {draw, circle}]
+        \node[main] (1) {$n_{root}$};
+        \node[main] (22) [below of=1] {$n_2$};
+        \node[main] (21) [left of=22] {$n_1$};
+        \node[main] (23) [right of=22] {$n_3$};
+        \node[main] (31) [below of=22, xshift=-7.5mm] {$n_4$};
+        \node[main, ultra thick] (32) [below of=22, xshift=7.5mm] {$n_5$};
+
+        \node[draw, rectangle, below=1mm of 32] {\footnotesize $prediction_{5} = 0.211$};
+        
+        \draw[-stealth] (1) -- (21);
+        \draw[-stealth, ultra thick] (1) -- (22);
+        \draw[-stealth] (1) -- (23);
+        \draw[-stealth] (22) -- (31);
+        \draw[-stealth, ultra thick] (22) -- (32);
+    \end{tikzpicture}
+    \caption{Iteration $3$}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    % TikZ code for the second graph
+    \begin{tikzpicture}[node distance={15mm}, main/.style = {draw, circle, inner sep=0.1cm}]
+        \node[main] (1) {$n_{root}$};
+        \node[main] (22) [below of=1] {$n_2$};
+        \node[main] (21) [left of=22] {$n_1$};
+        \node[main] (23) [right of=22] {$n_3$};
+        \node[main] (31) [below of=22, xshift=-7.5mm] {$n_4$};
+        \node[main] (32) [below of=22, xshift=7.5mm] {$n_5$};
+        \node[main] (41) [below of=32, ultra thick] {$n_6$};
+
+        \node[draw, rectangle, below=1mm of 41] {\footnotesize $prediction_{6} = 0.989$};
+        
+        \draw[-stealth] (1) -- (21);
+        \draw[-stealth, ultra thick] (1) -- (22);
+        \draw[-stealth] (1) -- (23);
+        \draw[-stealth] (22) -- (31);
+        \draw[-stealth, ultra thick] (22) -- (32);
+        \draw[-stealth, ultra thick] (32) -- (41);
+    \end{tikzpicture}
+    \caption{Iteration $4$}
+\end{subfigure}
+\par\bigskip
+\begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    % TikZ code for the first graph
+    \begin{tikzpicture}[node distance={15mm}, main/.style = {draw, circle}]
+        \node[main] (1) {$n_{root}$};
+        \node[main] (22) [below of=1] {$n_2$};
+        \node[main, ultra thick] (21) [left of=22] {$n_1$};
+        \node[main] (23) [right of=22] {$n_3$};
+        \node[main] (31) [below of=22, xshift=-7.5mm] {$n_4$};
+        \node[main] (32) [below of=22, xshift=7.5mm, pattern=north east lines,pattern color=red!40] {$n_5$};
+        \node[main] (41) [below of=32, pattern=north east lines,pattern color=red!40] {$n_6$};
+        
+        \node[draw, rectangle, below=1mm of 21, xshift=-14.5mm] {\footnotesize $prediction_{1} = -0.369$};
+        
+        \draw[-stealth, ultra thick] (1) -- (21);
+        \draw[-stealth] (1) -- (22);
+        \draw[-stealth] (1) -- (23);
+        \draw[-stealth] (22) -- (31);
+        \draw[-stealth] (22) -- (32);
+        \draw[-stealth] (32) -- (41);
+    \end{tikzpicture}
+    \caption{Iteration $5$}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    % TikZ code for the first graph
+    \begin{tikzpicture}[node distance={15mm}, main/.style = {draw, circle}]
+        \node[main] (1) {$n_{root}$};
+        \node[main] (22) [below of=1, pattern=north east lines,pattern color=red!40] {$n_2$};
+        \node[main, draw=green!100] (21) [left of=22, pattern=north east lines,pattern color=red!40] {$n_1$};
+        \node[main] (23) [right of=22, ultra thick] {$n_3$};
+        \node[main] (31) [below of=22, xshift=-7.5mm, pattern=north east lines,pattern color=red!40] {$n_4$};
+        \node[main] (32) [below of=22, xshift=7.5mm, pattern=north east lines,pattern color=red!40] {$n_5$};
+        \node[main] (41) [below of=32, pattern=north east lines,pattern color=red!40] {$n_6$};
+        
+        \node[draw, rectangle, below=1mm of 23, xshift=14mm] {\footnotesize $prediction_{3} = 3.683$};
+        
+        \draw[-stealth] (1) -- (21);
+        \draw[-stealth] (1) -- (22);
+        \draw[-stealth, ultra thick] (1) -- (23);
+        \draw[-stealth] (22) -- (31);
+        \draw[-stealth] (22) -- (32);
+        \draw[-stealth] (32) -- (41);
+    \end{tikzpicture}
+    \caption{Iteration $6$}
+\end{subfigure}

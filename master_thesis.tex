@@ -1,0 +1,41 @@
+\documentclass[oneside,a4paper,12pt]{article} % Gibt an: Papierformat, Schriftgröße
+
+\usepackage{thesis}
+
+% Hier werden die Abkürzungen definiert. Sofern ein Abkürzungsverzeichnis verwendet wird bitte entkommentieren.
+\include{sections/0_acronyms}
+
+\begin{document}
+\setlanguageEnglish % Sprache einstellen.
+
+% Hier kommt der ganze Vorspann. Bei Verwendung von Abkürzungs-, Abbildungs- oder Tabellenverzeichnisse bitte in dieser Datei entsprechend entkommentieren.
+\include{sections/0_preamble}
+
+% Füge hier die Kapitel per Verweis ein. Der Befehl \include fügt die angegebene tex-Datei an der jeweiligen Stelle ein. Die eingefügte Datei wird als normaler Teil des Quelltextes mitverarbeitet und ist daher LaTeX-Code (ohne Vorspann und \begin{document}...\end{document}).
+\include{sections/1_introduction}
+\include{sections/2_graph_deep_learning}
+\include{sections/3_explaining_gnns}
+\include{sections/4_problem_statement}
+\include{sections/5_related_work}
+\include{sections/6_methodology}
+\include{sections/7_evaluation}
+\include{sections/8_conclusion}
+% ...usw.
+
+
+
+% Anhang / Appendix
+\appendix % Ab hier wird mit A, B, ... weiternummeriert.
+% Für den Fall eines Anhangs entkommentieren
+%\include{sections/99_appendix}
+
+% Literaturverzeichnis
+\bibliographystyle{acm}
+%\bibliographystyle{ACM-Reference-Format}
+\bibliography{references} % Datei mit Literaturangaben einbinden
+
+% Schriftliche Erklärung
+\newpage
+\include{sections/99_assertion}
+
+\end{document}

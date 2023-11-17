@@ -1,0 +1,44 @@
+\tikzset{
+  basic/.style  = {thin, align=center, level distance=30mm},
+  root/.style   = {basic},
+  level 2/.style = {basic, sibling distance=40mm},
+  level 3/.style = {basic, sibling distance=30mm},
+  no edge from this parent/.style={
+        every child/.append style={
+        basic/.style={draw=none}}},
+}
+\begin{tikzpicture}[level 1/.style={sibling distance=80mm, level distance=30mm}, >=latex]
+\footnotesize
+    \node [root] (r) {$n_0 = (\varnothing, 0.98, null, \{n_1, n_2\}, 94, 0, 1)$}
+      child {
+        node [level 2] (n1) {$n_1 = (\{\varepsilon_1\}, 0.77, n_0, \{n_3, n_4\}, 57, 0.21, 1)$}
+        child {
+          node [level 3] (n11) {$n_3 = (\{\varepsilon_1, \varepsilon_2\}, 0.83, \dots)$}
+        }
+        child {
+          node [level 3] (n12) {$n_4 = (\{\varepsilon_1, \varepsilon_{l}\}, 0.47, \dots)$}
+        }
+      }
+      child {
+        node [level 2] (n2) {$n_2 = (\{\varepsilon_{l}\}, 0.87, n_0, \{n_5, n_6\}, 11, 0.11, 1)$}
+        child {
+          node [level 3] (n21) {$n_5 = (\{\varepsilon_{l}, \varepsilon_1\}, 0.47, \dots)$}
+        }
+        child {
+          node [level 3] (n22) {$n_6 = (\{\varepsilon_{l}, \varepsilon_{l - 1}\}, 0.59, \dots)$} 
+        }
+      };
+    \node [below of=n11](d1){$\vdots$};
+    \node [below of=n12](d2){$\vdots$};
+    \node [below of=n21](d3){$\vdots$};
+    \node [below of=n22](d4){$\vdots$};
+    
+    \path (n1.east) -- (n2.west) node [midway, yshift=15mm] {$\cdots$};
+    \path (n11.east) -- (n12.west) node [midway, yshift=15mm] {$\cdots$};
+    \path (n21.east) -- (n22.west) node [midway, yshift=15mm] {$\cdots$};
+
+    \path (d1.east) -- (d2.west) node [midway] {$\cdots$};
+    \path (d2.east) -- (d3.west) node [midway] {$\cdots$};
+    \path (d3.east) -- (d4.west) node [midway] {$\cdots$};
+    
+\end{tikzpicture}

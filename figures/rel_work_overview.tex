@@ -1,0 +1,38 @@
+\tikzset{
+  basic/.style  = {draw, rectangle, font={\small}},
+  root/.style   = {basic, thin, align=center, minimum height=0.75cm},
+  level 2/.style = {basic, thin, align=center, sibling distance=37.5mm, text width=8em, minimum height=0.75cm},
+  level 3/.style = {basic, thin, align=center, sibling distance=30mm, text width=8em, minimum height=0.75cm},
+  level 4/.style = {basic, thin, align=center, text width=7.5em, pattern=north west lines, pattern color=lightgray}
+}
+\begin{tikzpicture}[level 1/.style={sibling distance=80mm}, edge from parent/.style={->,draw}, >=latex]
+    \node[root] {\gls{tgnn} Explanations}
+        child {node[level 2] (c1) {On \glspl{dtdg}}
+            child {node[level 3] (c11) {Surrogate}}
+            child {node[level 3] (c12) {Features}}
+            child {node[level 3] (c13) {Decomposition}}
+        }
+        child {node[level 2] (c2) {On \glspl{ctdg}}
+            child {node[level 3] (c21) {Perturbation}}
+        };
+
+        \begin{scope}[every node/.style={level 4}]
+        \node[below of = c11, xshift=0.25em] (c111) {He et al. \cite{he_explainer_2022}};
+        \node[below of = c12, xshift=0.25em] (c121) {GCN-SE \cite{fan_gcn-se_2021}};
+        \node[below of = c13, xshift=0.25em] (c131) {Liu et al. \cite{liu_differential_2023}};
+        \node[below of = c131] (c132) {DGExplainer \cite{xie_explaining_2022}};
+
+        \node[below of = c21, text width=9em, xshift=1em] (c211) {TGNNExplainer \cite{xia_explaining_2023}};
+        
+    \end{scope}
+
+    \foreach \value in {1}
+        \draw[->] (c11.172) |- (c11\value.west);
+    \foreach \value in {1}
+        \draw[->] (c12.172) |- (c12\value.west);
+    \foreach \value in {1,2}
+        \draw[->] (c13.172) |- (c13\value.west);
+    \foreach \value in {1}
+        \draw[->] (c21.172) |- (c21\value.west);
+    
+\end{tikzpicture}

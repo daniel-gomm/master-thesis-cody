@@ -1,0 +1,41 @@
+\section{Some Appendix}
+\subsection{Some subsection}
+
+
+
+\subsection{Exponential complexity for possible combinations of past events}
+\label{s_Appendix_NFactorialComplexity}
+
+A counterfactual example $\mathcal{X}_{\varepsilon_i}$ for the prediction of a potential future edge addition event $\varepsilon_i$ from the dynamic graph $\mathcal{G}$, could be any combination of past events $\mathcal{X}_{\varepsilon_i} \subseteq \mathcal{G}(t_i) \setminus \varepsilon_i$. For $n = |\mathcal{G}(t_i) \setminus \varepsilon_i|$ the number of combinations is:
+
+\begin{equation}
+    \sum_{k=0}^n \binom{n}{k}
+\end{equation}
+
+
+
+N-factorial growth can be proven by induction. Let $P(n)$ be the statement:
+
+\begin{equation}
+    \sum_{k=0}^n \binom{n}{k} \geq n!, \vspace{10pt} \forall n \in \mathbb{N}_0
+\end{equation}
+
+The proof is given by induction on $n$.
+
+Base case: $n = 0$
+
+\begin{center}
+    $P(0): \sum_{k=0}^0 \binom{0}{k} = \binom{0}{k} = 1 \geq 1 = 0!$
+\end{center}
+
+Induction step: Show that for every $m \geq 0$, if $P(m)$ holds true, then $P(m+1)$ also holds.
+
+\begin{center}
+    $\sum_{k=0}^{m + 1} \binom{m + 1}{k} = \sum_{k=0}^{m + 1} \frac{(m+1)!}{(m+1-k)! * k!}$
+
+    $= \sum_{k=0}^{m} \frac{(m+1)!}{(m+1-k)! * k!} + \frac{(m+1)!}{(m+1-m-1)! * (m+1)!} = \sum_{k=0}^{m} \frac{(m+1)!}{(m+1-k)! * k!} + 1$
+
+    $= \sum_{k=0}^{m} (\frac{m!}{(m-k)! * k!} * \frac{m + 1}{m + 1 - k}) + 1 \stackrel{(*)}{\geq} \sum_{k=0}^{m} \frac{m!}{(m-k)! * k!} + 1$
+
+    $= m! + \frac{m!}{(m-m + 1)! * k!}$
+\end{center}
