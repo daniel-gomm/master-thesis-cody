@@ -22,7 +22,8 @@
         \node[below of = c13, xshift=0.25em] (c131) {Liu et al. \cite{liu_differential_2023}};
         \node[below of = c131] (c132) {DGExplainer \cite{xie_explaining_2022}};
 
-        \node[below of = c21, text width=9em, xshift=1em] (c211) {TGNNExplainer \cite{xia_explaining_2023}};
+        \node[below of = c21, text width=9em, xshift=1em] (c211) {T-GNNExplainer \cite{xia_explaining_2023}};
+        \node[below of = c211, text width=9em] (c212) {TempME \cite{chen_tempme_2023}};
         
     \end{scope}
 
@@ -32,7 +33,7 @@
         \draw[->] (c12.172) |- (c12\value.west);
     \foreach \value in {1,2}
         \draw[->] (c13.172) |- (c13\value.west);
-    \foreach \value in {1}
+    \foreach \value in {1,2}
         \draw[->] (c21.172) |- (c21\value.west);
     
 \end{tikzpicture}

@@ -1,0 +1,169 @@
+\tikzset{
+  marker legend/.style  = {circle,draw,scale=0.5}
+}
+
+\pgfplotsset{
+    compat=1.3,
+    % define a custom `axis' style
+    fpfm plot style/.style={
+        axis line style={darkslategray38},
+        tick align=inside,
+        x grid style={lightgray204},
+        xlabel=\textcolor{darkslategray38}{$fid_-$},
+        xmajorgrids,
+        xmajorticks=true,
+        xtick style={color=darkslategray38},
+        y grid style={lightgray204},
+        ylabel=\textcolor{darkslategray38}{$fid_+$},
+        ymajorgrids,
+        ymajorticks=true,
+        ytick style={color=darkslategray38},
+        width=0.45\linewidth,
+        height=5.5cm,
+        scatter/classes={%
+    		a={mark=*,forestgreen4416044},%
+    		b={mark=*,darkorange25512714},%
+    		c={mark=*,crimson2143940},
+            d={mark=*,steelblue31119180},%
+    		e={mark=o,forestgreen4416044},%
+    		f={mark=o,darkorange25512714},
+            g={mark=o,crimson2143940},%
+    		h={mark=o,steelblue31119180},%
+    		i={mark=triangle*,black25}
+      },
+    },
+}
+
+\begin{tikzpicture}
+
+\footnotesize
+\definecolor{black25}{RGB}{25,25,25}
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+    title={Correct predictions},
+    name=correct ucim,
+    xmin=0, xmax=1,
+    ymin=0, ymax=0.45,
+    fpfm plot style]
+    \addplot [ scatter, only marks, scatter src=explicit symbolic] 
+    table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/ucim_fid_correct.csv};
+\end{axis}
+
+\begin{axis}[
+    title={Wrong predictions},
+    name=wrong ucim,
+    xmin=0, xmax=1,
+    ymin=0, ymax=0.45,
+    at={(correct ucim.south east)},
+    anchor=left of south west,
+    xshift=5mm,
+    fpfm plot style]
+    \addplot [ scatter, only marks, scatter src=explicit symbolic] 
+    table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/ucim_fid_wrong.csv};
+\end{axis}
+
+\node [left=of correct ucim, rotate=90, anchor=north, yshift=0.75cm]{UCI-Messages};
+
+\end{tikzpicture}
+
+\vspace{0.25cm}
+
+\begin{tikzpicture}
+
+\footnotesize
+\definecolor{black25}{RGB}{25,25,25}
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+    title={Correct predictions},
+    name=correct uci,
+    xmin=0, xmax=1,
+    ymin=0, ymax=0.45,
+    fpfm plot style]
+    \addplot [ scatter, only marks, scatter src=explicit symbolic] 
+    table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/uci_fid_correct.csv};
+\end{axis}
+
+\begin{axis}[
+    title={Wrong predictions},
+    name=wrong uci,
+    xmin=0, xmax=1,
+    ymin=0, ymax=0.45,
+    at={(correct uci.south east)},
+    anchor=left of south west,
+    xshift=5mm,
+    fpfm plot style]
+    \addplot [ scatter, only marks, scatter src=explicit symbolic] 
+    table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/uci_fid_wrong.csv};
+\end{axis}
+
+\node [left=of correct uci, rotate=90, anchor=north, yshift=0.75cm]{UCI-Forums};
+
+\end{tikzpicture}
+
+\vspace{0.25cm}
+
+\begin{tikzpicture}
+
+\footnotesize
+\definecolor{black25}{RGB}{25,25,25}
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+    title={Correct predictions},
+    name=correct wiki,
+    xmin=0, xmax=1,
+    ymin=0, ymax=0.6,
+    fpfm plot style]
+    \addplot [ scatter, only marks, scatter src=explicit symbolic] 
+    table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/wiki_fid_correct.csv};
+\end{axis}
+
+\begin{axis}[
+    title={Wrong predictions},
+    name=wrong wiki,
+    xmin=0, xmax=1,
+    ymin=0, ymax=0.6,
+    at={(correct wiki.south east)},
+    anchor=left of south west,
+    xshift=5mm,
+    fpfm plot style]
+    \addplot [ scatter, only marks, scatter src=explicit symbolic] 
+    table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/wiki_fid_wrong.csv};
+\end{axis}
+
+\node [left=of correct wiki, rotate=90, anchor=north, yshift=0.75cm]{Wikipedia};
+
+
+\matrix [
+    draw,
+    matrix of nodes,
+    anchor=north,
+    yshift=-2.5mm,
+    node font=\small,
+] at ($ (correct wiki.below south west)!0.5!(wrong wiki.below south east) $) {
+     &\footnotesize random &\footnotesize closest &\footnotesize recent &\footnotesize 1-delta &\footnotesize no selection strategy \\
+    \footnotesize \gls{cftgnn} &  \node[marker legend,forestgreen4416044,fill=forestgreen4416044] (c) at (0,1.5mm){};  & \node[marker legend,crimson2143940,fill=crimson2143940] (c) at (0,1.5mm){};  & \node[marker legend,darkorange25512714,fill=darkorange25512714] (c) at (0,1.5mm){}; & \node[marker legend,steelblue31119180,fill=steelblue31119180] (c) at (0,1.5mm){}; & \\
+    
+    \footnotesize \gls{greedycf} & \node[marker legend,forestgreen4416044] (c) at (0,1.5mm){};  & \node[marker legend,crimson2143940] (c) at (0,1.5mm){};  & \node[marker legend,darkorange25512714] (c) at (0,1.5mm){}; & \node[marker legend,steelblue31119180] (c) at (0,1.5mm){}; & \\
+    \footnotesize T-GNNExplainer &  &  &  &  & \node[isosceles triangle,isosceles triangle apex angle=60,rotate=90,draw,black25,fill=black25,scale=0.3] (c) at (0,1.5mm){};\\
+};
+
+
+\end{tikzpicture}

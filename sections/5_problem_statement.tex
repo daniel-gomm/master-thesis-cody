@@ -1,0 +1,93 @@
+\section{Problem Formulation}
+\label{s_ProblemFormulation}
+
+% Problem Formulation in CF² paper and tgnnexplainer paper as examples
+This chapter lays the foundation for exploring the explainability of prediction models on dynamic graphs in this thesis by formulating the task of finding counterfactual explanations on \glspl{ctdg}. It introduces the task of future link prediction (Section \ref{s_ProblemFormulation_Task}). This task serves as the reference task for proposing the explanation method. Subsequently, counterfactual explanations are defined for future link prediction (Section \ref{s_ProblemFormulation_CFExamples}). Section \ref{s_ProblemFormulation_Objectives} presents the specific objectives pursued within the explanation approach. Finally, the overall goal of this thesis is summarized in Section \ref{s_ProblemFormulation_ProblemStatement}.
+
+\subsection{Explanations for Future Link Prediction}
+\label{s_ProblemFormulation_Task}
+In the context of future link prediction, a link prediction model $f: \{\mathcal{G}(t_i), \varepsilon_i\} \rightarrow \mathbbm{R}$ is tasked with predicting whether a potential future edge addition event $\varepsilon_{i} = \{e_j, f_{e_j, t_i}^{edge}, \mathrm{add}, t_i\}$ will occur. The prediction is based on all events $\mathcal{G}(t_i) = \{\varepsilon_{l} | \varepsilon_{l} \in \mathcal{G}, t_l \leq t_i\}$ from the temporal graph $\mathcal{G}$ that happened before or at time $t_i$. Without loss of generality, it is assumed that $f$ provides its prediction in the form of real-valued logits, defined as the quantile function of the standard logistical distribution. The logit values capture the model's confidence in the occurrence of the event. The model $f$ can be any function that fits this description, for example, a \gls{tgnn} trained on future link prediction. In this task, the model $f$ is also referred to as link prediction function. The binary classification function $p: \mathbbm{R} \rightarrow \{0, 1\}$ is applied to the output of the link prediction function $f$ to get the final interpretation of the prediction:
+
+\begin{equation}
+    p(f(\mathcal{G}(t_i), \varepsilon_{i})) = 
+    \begin{cases}
+    1,  &\text{if } f(\mathcal{G}(t_i), \varepsilon_{i}) \geq 0 \\
+    0,  &\text{else}
+    \end{cases}
+\end{equation}
+
+A value of $1$ indicates a forecast of the future link’s occurrence, while $0$ indicates a forecast of non-occurrence.
+
+%\begin{equation}
+%    f(\mathcal{G}(t_i), \varepsilon_{i})=
+%    \begin{cases}
+%    1,  &\text{if the prediction is that $\varepsilon_{i}$ will occur} \\
+%    0,  &\text{if the prediction is that $\varepsilon_{i}$ will not occur}
+%    \end{cases}
+%\end{equation}
+An explainer is a function that provides an explanation for a model’s prediction. Within the context of future link prediction, an explainer $ex(\cdot)$ is a function that takes the link prediction function $f$, the explained event $\varepsilon_{i}$, and the list of past events $\mathcal{G}(t_i)$ as input and produces an explanation for the model's prediction as output.
+
+While the explanation approach proposed in this thesis primarily focuses on the domain of future link prediction, the insights gained can be generalized to adapt to node and graph classification tasks with minor adjustments.
+
+\subsection{Counterfactual Examples}
+\label{s_ProblemFormulation_CFExamples}
+
+As discussed in Section \ref{s_ExplainingGNNs}, counterfactual explanations are a valuable tool for providing intuitive and actionable explanations regarding “why” a specific prediction was made. Thus, they are particularly well-suited for explaining predictions made by difficult-to-understand deep graph models like \glspl{tgnn} in the context of future link prediction.
+
+%They are thus particularly well-suited for explaining predictions in the context of future link prediction by difficult-to-understand deep graph models like \glspl{tgnn}.
+
+A counterfactual example $\mathcal{X}_{\varepsilon_i}$ to a model's prediction on the occurrence of a future edge addition event $\varepsilon_{i}$ consist of a subset of past events $\mathcal{X}_{\varepsilon_i} \subseteq \mathcal{G}(t_i)$. To be considered counterfactual, the subset has to be necessary to produce the original prediction, satisfying the following condition:
+
+\begin{equation}
+    \label{e_CFExplanation}
+    p(f(\mathcal{G}(t_i), \varepsilon_{i})) \neq p(f(\mathcal{G}(t_i) \setminus \mathcal{X}_{\varepsilon_i}, \varepsilon_{i}))
+\end{equation}
+
+For any potential future link $\varepsilon_{i}$, there may exist multiple counterfactual examples or no counterfactual example at all. The set containing all existing counterfactual examples for a possible future link $\varepsilon_{i}$ is denoted as $\Psi_{\varepsilon_i}$.
+
+A counterfactual explainer for the future link prediction task $ex$ is defined as a function that takes a link prediction function $f$, a temporal graph $\mathcal{G}(t_i)$, and a potential future edge addition event $\varepsilon_i$ as input. It outputs a subset of the events in the original input as a counterfactual explanation.
+
+\begin{equation}
+    \label{e_Explainer}
+    ex: \{f, \mathcal{G}(t_i), \varepsilon_i\} \rightarrow \bigcup_{k = 0}^{|\mathcal{G}(t_i) \setminus \varepsilon_i|} {\mathcal{G}(t_i) \setminus \varepsilon_i \choose k}
+\end{equation}
+
+This definition constrains the output of the explainer to any combination of past events, following the notation of \cite{stanley_enumerative_1986}.
+
+\subsection{Objectives of the Explainer}
+\label{s_ProblemFormulation_Objectives}
+
+Explaining future link predictions using counterfactual examples entails two primary objectives:
+
+\begin{enumerate}
+    \item \textbf{Maximize Discoveries}: The explainer's first objective is to maximize the proportion of cases in which it successfully identifies a counterfactual example. Every subset of past events could potentially constitute a counterfactual example. Given that the number of possible combinations of past events grows exponentially with the number of past events, it quickly becomes infeasible to explore all possible combinations. Thus, the explainer $ex$ should seek to efficiently identify counterfactual examples, maximizing the instances in which the explanation is necessary to the explained prediction. This is achieved by maximizing the following expression:
+    \begin{equation}
+        \label{e_maxExplanationRate}
+        \frac{1}{\mathcal{G}} \sum_{\varepsilon_{i} \in \mathcal{G}} \mathbbm{1}(ex(f, \mathcal{G}(t_i), \varepsilon_{i}) \in \Psi_{\varepsilon_i})
+    \end{equation}
+    The indicator function $\mathbbm{1}(ex(f, \mathcal{G}(t_i), \varepsilon_{i}) \in \Psi_{\varepsilon_i})$ returns $1$ if the explainer $ex$ finds a counterfactual example for the given input and returns $0$ otherwise.
+    \item \textbf{Minimize Complexity}: When multiple counterfactual examples exist, the explainer aims to select the most concise yet informative explanation. In line with Occam’s razor principle, good explanations should be simple, comprising only the most relevant information \cite{yuan_explainability_2020, tan_learning_2022}. Hence, counterfactual examples should have minimal sizes, as measured by the number of events they contain:
+    \begin{equation}
+        \label{e_minCFExampleSize}
+        \argmin_{\mathcal{X}_{\varepsilon_i}^j \in \Psi_{\varepsilon_i}} |\mathcal{X}_{\varepsilon_i}^j|
+    \end{equation}
+\end{enumerate}
+
+%To pursue the first objective, the explainer $ex(\cdot)$ should maximize the following expression:
+
+
+%To achieve the second objective, the counterfactual example should have minimal size, as measured by the number of events it contains:
+
+%Every subset of past events could potentially constitute a counterfactual example. Since the number of possible combinations of past events has exponential growth with the number of past events, exploring all combinations quickly gets infeasible. Thus, the explainer seeks to find an counterfactual example in as many cases as possible. Therefore, the primary objective is to maximize the proportion of cases in which an explainer manages to find a counterfactual example.\\
+%In the case that there exist multiple counterfactual examples we search for that example that explains the prediction best. Following Occam's razor principle good explanations should be simple \cite{yuan_explainability_2020, tan_learning_2022}, only consisting of the most relevant information. This leads to the second objective that explanations should be as small as possible, thus the counterfactual example should have minimal size. Therefore, the number of events contained in the counterfactual example is minimized:
+
+% Small explanations and stability on the level of the actual explanations; maximum number of found counterfactual examples overall
+
+\subsection{Problem Statement}
+\label{s_ProblemFormulation_ProblemStatement}
+
+In summary, this thesis proposes explaining predictions made by \glspl{tgnn} in the context of future link prediction using counterfactual examples.
+
+Given a \gls{ctdg} $\mathcal{G} = \{\varepsilon_{1}, \varepsilon_{2}, ...\}$, and a trained temporal graph model $f$, an explainer $ex$ provides explanations for why the model predicts either the occurrence or non-occurrence of an event $\varepsilon_{i}$. The explanation consists of a subset of the past events $\mathcal{X}_{\varepsilon_{i}}$.
+
+The primary objectives of an explainer are two-fold: maximizing the number of cases in which it successfully identifies a counterfactual example while concurrently minimizing the complexity of the explanation.

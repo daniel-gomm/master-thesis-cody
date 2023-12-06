@@ -1,4 +1,4 @@
-\begin{tabular}{ p{3.25cm} >{\centering\arraybackslash} p{2.2cm} >{\centering\arraybackslash} p{2cm} >{\centering\arraybackslash} p{1cm} >{\centering\arraybackslash} p{1.25cm} >{\centering\arraybackslash} p{1.25cm} >{\centering\arraybackslash} p{2cm} }
+\begin{tabular}{ p{3.4cm} >{\centering\arraybackslash} p{2.2cm} >{\centering\arraybackslash} p{2cm} >{\centering\arraybackslash} p{1cm} >{\centering\arraybackslash} p{1.25cm} >{\centering\arraybackslash} p{1.25cm} >{\centering\arraybackslash} p{2cm} }
     \hline
     %Method & \begin{sideways} Dynamic Graph \end{sideways}&\begin{sideways} Tasks \end{sideways}&\begin{sideways} Approach \end{sideways}&\begin{sideways} Model Access \end{sideways}&\begin{sideways} Model Agnostic \end{sideways}&\begin{sideways} CF explanations \end{sideways} \\
     Method & Tasks & Approach & No\newline Model\newline Access & Model\newline Agnostic & \gls{ctdg} & CF\newline explanations\\
@@ -11,8 +11,10 @@
      %\hline
     DGExplainer \cite{xie_explaining_2022} & FLP, NR & Decomposition & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
     %\hline
-    TGNNExplainer \cite{xia_explaining_2023} & FLP & Perturbation & $\sim^*$ & \ding{51}* & \ding{51} & $\cdot$ \\
+    T-GNNExplainer \cite{xia_explaining_2023} & FLP & Perturbation & $\sim^*$ & \ding{51}* & \ding{51} & $\cdot$ \\
+    TempME \cite{chen_tempme_2023} & FLP & Perturbation & \ding{51} & \ding{51} & \ding{51} & $\cdot$ \\
     %\hline
+    \textit{\gls{greedycf} (this work)} & FLP & Search & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
     \textit{\gls{cftgnn} (this work)} & FLP & Search & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
     \hline
 \end{tabular}

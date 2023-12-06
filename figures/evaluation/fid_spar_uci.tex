@@ -1,0 +1,304 @@
+\pgfplotsset{
+    compat=1.3,
+    % define a custom `axis' style
+    fs plot style/.style={
+        axis line style={darkslategray38},
+        tick align=inside,
+        x grid style={lightgray204},
+        xlabel=\textcolor{darkslategray38}{$sparsity$},
+        xmajorgrids,
+        xmajorticks=true,
+        xtick style={color=darkslategray38},
+        y grid style={lightgray204},
+        ylabel=\textcolor{darkslategray38}{$fid_+$},
+        ymajorgrids,
+        ymajorticks=true,
+        ytick style={color=darkslategray38},
+    },
+}
+
+
+\begin{tikzpicture}
+\footnotesize
+\definecolor{black25}{RGB}{25,25,25}
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+fs plot style,
+xmin=0, xmax=1,
+ymin=0, ymax=0.5,
+title={Correct predictions},
+name=correct plot
+]
+\addplot [line width=1pt, steelblue31119180]
+table {%
+0.015615 0
+0.015625 0.17
+0.03125 0.275
+0.046875 0.325
+0.0625 0.35
+0.078125 0.37
+0.125 0.375
+0.15625 0.38
+0.234375 0.385
+0.640625 0.39
+0.921875 0.4
+1 0.4
+};
+\addplot [line width=1pt, darkorange25512714]
+table {%
+0.015615 0
+0.015625 0.17
+0.03125 0.275
+0.046875 0.31
+0.0625 0.32
+0.078125 0.33
+0.109375 0.34
+0.140625 0.345
+0.15625 0.355
+0.171875 0.36
+0.265625 0.365
+0.28125 0.37
+0.296875 0.375
+0.921875 0.38
+0.953125 0.385
+1 0.385
+};
+\addplot [line width=1pt, forestgreen4416044]
+table {%
+0.015615 0
+0.015625 0.17
+0.03125 0.215
+0.046875 0.25
+0.0625 0.255
+0.078125 0.28
+0.09375 0.29
+0.125 0.295
+0.171875 0.305
+0.203125 0.31
+0.328125 0.315
+1 0.315
+};
+\addplot [line width=1pt, crimson2143940]
+table {%
+0.015615 0
+0.015625 0.17
+0.03125 0.185
+0.046875 0.195
+0.1875 0.2
+0.734375 0.205
+0.890625 0.21
+0.921875 0.215
+1 0.215
+};
+\addplot [line width=1pt, steelblue31119180, dashed]
+table {%
+0.015615 0
+0.015625 0.175
+0.03125 0.235
+0.046875 0.255
+0.0625 0.265
+0.078125 0.275
+0.109375 0.28
+0.125 0.285
+1 0.285
+};
+\addplot [line width=1pt, darkorange25512714, dashed]
+table {%
+0.015615 0
+0.015625 0.17
+0.03125 0.255
+0.046875 0.3
+0.0625 0.35
+0.078125 0.37
+0.09375 0.385
+0.109375 0.395
+0.125 0.41
+0.140625 0.415
+0.15625 0.42
+0.1875 0.425
+1 0.425
+};
+\addplot [line width=1pt, forestgreen4416044, dashed]
+table {%
+0.015615 0
+0.015625 0.015
+0.03125 0.02
+0.046875 0.04
+0.0625 0.05
+1 0.05
+};
+\addplot [line width=1pt, crimson2143940, dashed]
+table {%
+0.015615 0
+0.015625 0.005
+0.03125 0.01
+1 0.01
+};
+\addplot [line width=1pt, black25, dash pattern=on 1pt off 3pt on 3pt off 3pt]
+table {%
+0.0333233333333333 0
+0.0333333333333333 0.01
+0.1 0.015
+0.2 0.025
+0.266666666666667 0.03
+0.466666666666667 0.035
+0.6 0.04
+0.7 0.045
+1 0.045
+};
+\end{axis}
+
+\begin{axis}[
+fs plot style,
+at={(correct plot.south east)},
+anchor=left of south west,
+xshift=5mm,
+title={Wrong predictions},
+xmin=0, xmax=1,
+ymin=0, ymax=0.5,
+name=wrong plot
+]
+\addplot [line width=1pt, steelblue31119180]
+table {%
+0.015615 0
+0.015625 0.19
+0.03125 0.285
+0.046875 0.295
+0.0612244897959184 0.3
+0.0625 0.34
+0.078125 0.365
+0.109375 0.37
+0.125 0.375
+0.140625 0.385
+0.15625 0.39
+0.171875 0.395
+0.1875 0.4
+0.21875 0.405
+1 0.405
+};
+\addplot [line width=1pt, darkorange25512714]
+table {%
+0.015615 0
+0.015625 0.19
+0.03125 0.27
+0.0612244897959184 0.275
+0.0625 0.305
+0.078125 0.325
+0.09375 0.335
+0.109375 0.35
+0.125 0.365
+0.140625 0.37
+0.203125 0.375
+1 0.375
+};
+\addplot [line width=1pt, forestgreen4416044]
+table {%
+0.015615 0
+0.015625 0.19
+0.03125 0.22
+0.046875 0.25
+0.0625 0.26
+0.078125 0.27
+0.09375 0.28
+0.140625 0.295
+0.1875 0.3
+0.234375 0.305
+0.244897959183673 0.31
+1 0.31
+};
+\addplot [line width=1pt, crimson2143940]
+table {%
+0.015615 0
+0.015625 0.19
+0.03125 0.235
+0.163265306122449 0.24
+0.328125 0.245
+0.40625 0.25
+0.9375 0.255
+1 0.255
+};
+\addplot [line width=1pt, steelblue31119180, dashed]
+table {%
+0.015615 0
+0.015625 0.195
+0.03125 0.255
+0.046875 0.265
+1 0.265
+};
+\addplot [line width=1pt, darkorange25512714, dashed]
+table {%
+0.015615 0
+0.015625 0.17
+0.03125 0.24
+0.046875 0.275
+0.0625 0.29
+0.078125 0.3
+0.09375 0.31
+1 0.31
+};
+\addplot [line width=1pt, forestgreen4416044, dashed]
+table {%
+0.015615 0
+0.015625 0.03
+0.03125 0.05
+0.046875 0.06
+0.0625 0.065
+1 0.065
+};
+\addplot [line width=1pt, crimson2143940, dashed]
+table {%
+0.015615 0
+0.015625 0.01
+0.03125 0.015
+1 0.015
+};
+\addplot [line width=1pt, black25, dash pattern=on 1pt off 3pt on 3pt off 3pt]
+table {%
+-1e-05 0
+0 0.005
+0.0333333333333333 0.035
+0.0666666666666667 0.1
+0.1 0.115
+0.133333333333333 0.14
+0.166666666666667 0.145
+0.2 0.15
+0.233333333333333 0.16
+0.266666666666667 0.17
+0.3 0.175
+0.433333333333333 0.185
+0.5 0.195
+0.566666666666667 0.205
+0.6 0.21
+0.666666666666667 0.215
+0.7 0.225
+0.766666666666667 0.23
+0.8 0.245
+0.833333333333333 0.25
+0.866666666666667 0.26
+0.9 0.265
+0.933333333333333 0.275
+1 0.275
+};
+\end{axis}
+
+\matrix [
+    draw,
+    matrix of nodes,
+    anchor=north,
+    yshift=-2.5mm,
+    node font=\small,
+] at ($ (correct plot.below south west)!0.5!(wrong plot.below south east) $) {
+     & random & closest & recent & 1-best & no selection strategy \\
+    \gls{cftgnn} & \draw[forestgreen4416044,solid](-3mm,1.5mm) -- (3mm,1.5mm);  & \draw[crimson2143940,solid](-3mm,1.5mm) -- (3mm,1.5mm);  & \draw[darkorange25512714,solid](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[steelblue31119180,solid](-3mm,1.5mm) -- (3mm,1.5mm); & \\
+    
+    \gls{greedycf} & \draw[forestgreen4416044,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[crimson2143940,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[darkorange25512714,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[steelblue31119180,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \\
+    T-GNNExplainer &  &  &  &  & \draw[black25,loosely dashdotted](-3mm,1.5mm) -- (3mm,1.5mm);\\
+};
+
+\end{tikzpicture}

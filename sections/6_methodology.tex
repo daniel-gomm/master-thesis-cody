@@ -1,33 +1,50 @@
 \section{Methodology}
 \label{s_Methodology}
 
-To solve the problem defined in Section \ref{s_ProblemFormulation}, this chapter introduces \gls{cftgnn}. 
+This chapter addresses the explanation problem defined in Section \ref{s_ProblemFormulation} using search approaches. As the basis for finding counterfactual examples, Section \ref{s_Methodology_SearchSpace} defines the search space and explores how to structure it in accordance with the objectives defined for explainers. Next, Section \ref{s_Methodology_SelectionStrategies} introduces so-called selection strategies, which provide a heuristic approach to guiding the explainers during the search. Following that, Section \ref{s_Methodology_GreedyCF} presents \gls{greedycf}, which is a simple approach that uses a greedy heuristic for finding counterfactual examples. \gls{greedycf} serves as a capable baseline in this thesis and for future methods. The subsequent section introduces \gls{cftgnn}, which is a sophisticated search approach that builds upon past findings in reinforcement learning and factual explanation methods.
 
-\subsection{Overview}
-\label{s_Methodology_Overview}
+%To solve the problem defined in Section \ref{s_ProblemFormulation}, this chapter introduces two novel search-based explanation approaches. First, 
+%As there are not yet any explanation approaches for models on dynamic graphs, Section \ref{s_Methodology_GreedyBaseline} outlines a simple approach for finding counterfactual examples that serves as a capable baseline in this thesis and for future methods. The subsequent section introduces \acrfull{cftgnn}, which leverages counterfactual examples to provide intuitive and understandable explanations in the context of future link prediction on \glspl{ctdg}
 
-As outlined in Section \ref{s_ProblemFormulation_Objectives}, a counterfactual example $\mathcal{X}_{\varepsilon_i}$ for the prediction $y_{\varepsilon_i}$ of a link prediction function $f(\cdot)$ on a potential future edge addition event $\varepsilon_i$ from the dynamic graph $\mathcal{G}$, could be any combination of past events $\mathcal{X}_{\varepsilon_i} \subseteq \mathcal{G}(t_i) \setminus \varepsilon_i$. Let $S_{\varepsilon_i}$ denote the set containing all possible combinations of past events\footnote{following the notation of \cite{stanley_enumerative_1986}}:
+
+%To solve the problem defined in Section \ref{s_ProblemFormulation}, this chapter introduces \acrfull{cftgnn}, a novel search-based explanation approach developed in this thesis. \gls{cftgnn} leverages counterfactual examples to provide intuitive and understandable explanations in the context of future link prediction on \glspl{ctdg}. This chapter presents the details of \gls{cftgnn}'s design, its components, the rationale behind its development, and how it addresses the previously set objectives.
+%Section \ref{s_Methodology_Overview} provides an overview of the foundations of the explanation framework, exploring the search space for counterfactual examples and detailing how \gls{cftgnn} employs a search strategy to find such counterfactual examples. Subsequently, Section \ref{s_Methodology_Search} delves into the inner workings of \gls{cftgnn}, explaining the search algorithm in detail. The search algorithm is supplemented with a so-called selection strategy, which provides a heuristic approach for informing the exploration of the search tree (Section \ref{s_Methodology_Selection}). Finally, Section \ref{s_Methodology_GenericGraphTasks} covers how \gls{cftgnn} is generalized to explain other graph tasks.
+
+\subsection{Search Space}
+\label{s_Methodology_SearchSpace}
+
+
+%\subsection{Overview}
+%\label{s_Methodology_Overview}
+
+As outlined in Section \ref{s_ProblemFormulation_Objectives}, a counterfactual example $\mathcal{X}_{\varepsilon_i}$ for the prediction $y_{\varepsilon_i}$ of a link prediction function $f$ on a potential future edge addition event $\varepsilon_i$ from the dynamic graph $\mathcal{G}$, could be any combination of past events $\mathcal{X}_{\varepsilon_i} \subseteq \mathcal{G}(t_i) \setminus \varepsilon_i$. Let $S_{\varepsilon_i}$ denote the set containing all possible combinations of past events\footnote{following the notation of \cite{stanley_enumerative_1986}}:
 
 \begin{equation}
     S_{\varepsilon_i} = \bigcup_{k = 0}^{|\mathcal{G}(t_i) \setminus \varepsilon_i|} {\mathcal{G}(t_i) \setminus \varepsilon_i \choose k}
 \end{equation}
 
-Following the binomial theorem, for the $n = |\mathcal{G}(t_i) \setminus \varepsilon_i|$ past events, the complexity of enumerating over all combinations by brute force is $O(2^n)$, making a brute force approach highly computationally expensive, even at small $n$. Thus, the space of possible counterfactual examples needs to be explored effectively. \gls{cftgnn} achieves this with two measures: Spatial and temporal constraints on the explored space and an efficient search strategy adapted from reinforcement learning.
+Following the binomial theorem, for the $n = |\mathcal{G}(t_i) \setminus \varepsilon_i|$ past events, the complexity of enumerating over all combinations by brute force is $O(2^n)$, making a brute force approach highly computationally expensive, even at small $n$. Thus, the search space for possible counterfactual examples needs to be explored by more effective means. As a first step towards making the search space more manageable, spatial and temporal constraints on the search space are introduced. 
+%\gls{cftgnn} achieves this with two measures: Spatial and temporal constraints on the explored space and an efficient search strategy adapted from reinforcement learning.
 
 \subsubsection{Constraints on the Search Space}
-\label{s_Methodology_Overview_Constraints}
-To limit the size of the search space, spatial and temporal constraints are applied to the set of potential candidate explanations. The spatial constraint restricts the past events considered in the search to those in a $k$-hop-neighborhood $N_k(\varepsilon_i)$ of the explained event $\varepsilon_i$. If the link prediction function $f(\cdot)$ is a \gls{tgnn}, $k$ is set to the number of layers in the \gls{tgnn} since it predominantly aggregates information from events that occurred within this neighborhood \cite{yuan_explainability_2021}. The temporal constraint imposes an upper limit $m_{max}$ that restricts the considered events to the $m_{max}$ most recent events in the spatial neighborhood. Let $C(\mathcal{G}, \varepsilon_i, k, m_{max})$ be the set of past events considered for the search, for which the constraints mentioned above hold, then the search space $\hat{S}_{\varepsilon_i}$ is given by:
+\label{s_Methodology_SearchSpace_Constraints}
+To limit the size of the search space, spatial and temporal constraints are applied to the set of potential candidate explanations. The spatial constraint restricts the past events considered in the search to those in a $k$-hop-neighborhood $N_k(\varepsilon_i)$ of the explained event $\varepsilon_i$. If the link prediction function $f$ is a \gls{tgnn}, $k$ is set to the number of layers in the \gls{tgnn} since contemporary \glspl{tgnn} predominantly aggregate information from events that occurred within this neighborhood \cite{yuan_explainability_2021}. As a temporal constraint, only the $m_{max}$ most recent events that fulfill the spatial requirements are considered in the search. Formally, let $C(\mathcal{G}, \varepsilon_i, k, m_{max})$ be the set of past events considered for the search, for which the spatial and temporal constraints mentioned above hold, then the constrained search space $\hat{S}_{\varepsilon_i}$ is given by:
 
 \begin{equation}
     \hat{S}_{\varepsilon_i} = \bigcup_{l = 0}^{|C(\mathcal{G}, \varepsilon_i, k, m_{max})|} {C(\mathcal{G}, \varepsilon_i, k, m_{max}) \choose l}
 \end{equation}
 
-While these constraints can reduce the search space significantly, the complexity remains exponential at $O(2^{m_{max}})$. Thus, \gls{cftgnn} leverages a search strategy to maximize the potential of finding a counterfactual example, while partially exploring the search space.
+While these constraints can reduce the search space significantly, the complexity remains exponential at $O(2^{m_{max}})$, just with a fixed bound $m_{max}$. This means that even if only a moderate amount of $m_{max} = 32$ past events would be considered, more than four billion potential counterfactual examples would exist. Thus, the search space has to be structured in a way that enables the discovery of counterfactual examples in line with the objectives of the explainer (see Section \ref{s_ProblemFormulation_Objectives}) so that a search approach can find counterfactual explanations.
 
-\subsubsection{Search Framework}
-\label{s_Methodology_Overview_Search}
+%Thus, \gls{cftgnn} leverages a search strategy to maximize the potential of finding a counterfactual example, while partially exploring the search space.
 
-The search performed by \gls{cftgnn} successively builds a partial search tree $T$. Each node $n_j \in T$ in this search tree is associated with a candidate perturbation $s_j \in \hat{S}_{\varepsilon_i}$ from the search space. A node thus represents the omission of the events in the perturbation $s_j$ from the set of past events $\mathcal{G}(t_i)$. For a concise representation of the search tree, each node $n_j$ is represented as a tuple of associated attributes:
+\subsubsection{Structuring the Search Space}
+\label{s_Methodology_SearchSpace_Structure}
+
+%\subsubsection{Search Framework}
+%\label{s_Methodology_Overview_Search}
+%The search performed by \gls{cftgnn} successively builds a partial search tree $T$.
+Since traversing the full search space is infeasable, search algorithms search for counterfactual examples by successively building a partial search tree $T$. Each node $n_j \in T$ in this search tree is associated with a candidate perturbation $s_j \in \hat{S}_{\varepsilon_i}$ from the search space. A node thus represents the omission of the events in the perturbation $s_j$ from the set of past events $\mathcal{G}(t_i)$. For a concise representation of the search tree, each node $n_j$ is represented as a tuple of associated attributes:
 
 \begin{equation}
     n_j = (s_j, prediction_j, parent_j, children_j, selections_j, score_j, selectable_j)
@@ -40,7 +57,7 @@ The tuple associates node $n_j$ with several attributes. However, when a node is
 
     \item \textbf{Prediction result $prediction_j$}: The prediction result $prediction_j \in \mathbb{R} \cup \{null\}$ represents the prediction value that results from applying the link prediction function $f(\mathcal{G}(t_i) \setminus s_j, \varepsilon_i) = prediction_j$ for the explained event $\varepsilon_i$ to the perturbed input $\mathcal{G}(t_i) \setminus s_j$.
 
-    \item \textbf{Parent $parent_j$}: The parent attribute $parent_j \in T \cup \{null\}$ establishes a connection between node $n_j$ and the node from which is was derived. If $n_j$ is the root node the attribute is set to $null$.
+    \item \textbf{Parent $parent_j$}: The parent attribute $parent_j \in T \cup \{null\}$ establishes a connection between node $n_j$ and the node from which is was derived. If $n_j$ is the root node, the attribute is set to $null$.
 
     \item \textbf{Children $children_j$}: The set of child nodes $children_j \subset T$ contains all nodes directly connected to $n_j$ and positioned one level below in the search tree.
 
@@ -53,32 +70,120 @@ The tuple associates node $n_j$ with several attributes. However, when a node is
 
 % $s_j \in \hat{S}_{\varepsilon_i}$ denotes the set of perturbations associated with node $n_j$. The prediction result $prediction_j \in \mathbb{R} \cup \{null\}$ represents the prediction value that results from applying the link prediction function $f(\mathcal{G}(t_i) \setminus s_j, \varepsilon_i) = prediction_j$ for the explained event $\varepsilon_i$ to the perturbed input $\mathcal{G}(t_i) \setminus s_j$. The tuple also encompasses the parent node $parent_j \in T$, as well as a set of child nodes $children_j \subset T$. Additionally, it contains attributes that are updated throughout the search. The number of times this particular node has been selected in the search is denoted by $selections_j \in \mathbb{N} \cup \{null\}$. The attribute $score_j \in \mathbb{R} \cup \{null\}$ is used as a means to describe how promising node $n_j$ is to lead to a counterfactual example. Finally, the $selectable_j$ attribute is a binary flag that determines whether node $n_j$ can be chosen for further exploration. It is a boolean value defined as $selectable_j \in \{0, 1\}$, where $1$ signifies that $n_j$ is selectable, and $0$ that it is not.
 
-As a starting point for the search, the root node $n_{root}$ is initialized with the identity perturbation $s_{root} = \varnothing \in \hat{S}_{\varepsilon_i}$ and represents the original prediction without perturbations to the input. During the search, the search tree is iteratively expanded, starting from the root node. Expansion refers to the addition of a new node to the search tree. Whenever a new node $n_j$ is added to the search tree, the link prediction function $f(\cdot)$ is called to infer the prediction for the perturbation associated with the node $f(\mathcal{G}(t_i) \setminus s_j, \varepsilon_i)$. In the search, expanded nodes are always associated with a perturbation $s_j \in \hat{S}_{\varepsilon_i}$ that contains all the perturbations of their parent $s_{parent} \subset s_j$ and one more event $|s_j| = |s_{parent}| + 1$. This can be interpreted as iterative pruning of the past events on the direct path from the root node to any node in the search tree \cite{yuan_explainability_2021}.
+As a starting point for the search, the root node $n_{root}$ is initialized with the identity perturbation $s_{root} = \varnothing \in \hat{S}_{\varepsilon_i}$ and represents the original prediction without perturbations to the input. During the search, the search tree is iteratively expanded, starting from the root node. Expansion refers to the addition of a new node to the search tree. In the search, expanded nodes are always associated with a perturbation $s_j \in \hat{S}_{\varepsilon_i}$ that contains all the perturbations of their parent $s_{parent} \subset s_j$ and one more event $|s_j| = |s_{parent}| + 1$. This can be interpreted as iterative pruning of the past events on the direct path from the root node to any node in the search tree \cite{yuan_explainability_2021}.
 
-A depiction of such a search tree is given in Figure \ref{f_SearchTree_Example}. Following the leftmost path in this tree can be interpreted as first removing event $\varepsilon_1$ from the past events and then additionally removing event $\varepsilon_2$. The Figure shows the increasing size of the associated perturbation with depth in the tree and how these particular omissions affect the prediction score. In general, the fully expanded search tree at depth $k$ contains nodes associated with all candidate perturbations in the search space of size $k$.
+A depiction of such a search tree is given in Figure \ref{f_SearchTree_Example}. Following the leftmost path in this tree can be interpreted as first removing event $\varepsilon_1$ from the past events and then additionally removing event $\varepsilon_2$. The figure shows the increasing size of the perturbations associated with nodes with increasing depth in the tree. It also shows how omitting the events in the perturbations from the past events affects the prediction score. In general, the fully expanded search tree at depth $k$ contains nodes associated with all candidate perturbations in the search space of size $k$.
 
 
 %This means the node represents what happens to the model prediction when the events in the perturbation are omitted from the set of past events. A node in the search tree $n_j$ is thus characterized as a pair:
 
 
-\begin{figure} [h]
+\begin{figure} [ht]
     \centering
     \include{figures/search_tree_example}
     \caption{Example of a search tree for the explained event $\varepsilon_i$. Without loss of generality, it is assumed that the candidate events $C(\mathcal{G}, \varepsilon_i, k, m_{max})$ are denominated by $\varepsilon_1, \varepsilon_2, ..., \varepsilon_{l - 1}, \varepsilon_{l}$.}
     \label{f_SearchTree_Example}
 \end{figure}
 
-Organizing the search tree in this manner reflects the objectives of the explainer (Section \ref{s_ProblemFormulation_Objectives}). The increasing size of the associated candidate perturbations with increasing depth is tethered to minimizing the complexity of the encountered counterfactual examples. It allows the exploration of low-complexity explanation candidates without traversing the search tree to large depths. The goal of maximizing discoveries is pursued in the consecutive pruning approach. This allows a search algorithm on the search tree to follow promising paths for leading to a counterfactual example.
+Organizing the search tree in this manner reflects the objectives of the explainer (Section \ref{s_ProblemFormulation_Objectives}). The increasing size of the associated candidate perturbations with increasing depth is tethered to minimizing the complexity of the encountered counterfactual examples. It allows the exploration of low-complexity explanation candidates without traversing the search tree to large depths. The complexity of potential counterfactual explanations increases with the distance to the root node. The goal of maximizing discoveries is pursued in the consecutive pruning approach. This allows a search algorithm on the search tree to follow promising paths for leading to a counterfactual example.
 
-\gls{cftgnn} builds upon this search tree. It combines two main components: A search algorithm that balances exploration, venturing into unexplored areas of the search space \cite{browne_survey_2012}, with exploitation, looking into promising areas of the search space \cite{browne_survey_2012}. The search algorithm is tasked with selecting a node to expand in each iteration of the search and a selection strategy that guides the search algorithms on selecting yet unexplored nodes.
+\gls{greedycf} and \gls{cftgnn} build upon this search tree. While they share this framework for the search space, the search strategies they employ vary significantly. The following sections detail their operations.
+
+%\gls{cftgnn} builds upon this search tree. It combines two main components: A search algorithm that balances exploration, venturing into unexplored areas of the search space \cite{browne_survey_2012}, with exploitation, looking into promising areas of the search space \cite{browne_survey_2012}. The search algorithm is tasked with selecting a node to expand in each iteration of the search and a selection strategy that guides the search algorithms on selecting yet unexplored nodes.
 
 
-\subsection{A Search Algorithm to find Counterfactual Examples}
-\label{s_Methodology_Search}
+\subsection{Selection Strategies}
+\label{s_Methodology_SelectionStrategies}
+% Detail the different selection strategies, how they work and what the reasoning behind them is
+
+In addition to the structured search space, the proposed explanation methods share a mechanism used to inform the selection of events for the explanation. This mechanism is referred to as the selection strategy, and it is used when a selection has to be made between previously unexplored paths in the search tree. This has the aim of improving the search performance by exploring promising alternatives first. Since there have not been any prior works on this, four different selection strategies are proposed and compared. Let $A = {n_1,...,n_k}$ be the set of alternative nodes in the search tree that could be selected, and all of these nodes have not yet been expanded. The sets of perturbations associated with each of these nodes differ by exactly one event. Let $\varepsilon_1, ..., \varepsilon_k$ be the single events that differ between the respective nodes. The selection strategies provide a ranking of the different nodes based on these differing events.
+
+\begin{itemize}
+    \item \textbf{Random}: The random selection strategy serves as the baseline strategy. It selects a node $n_j \in A$ at random.
+    \item \textbf{Closest}: The closest selection strategy bases its selection on the differing events. It ranks the events based on their spatial distance to the explained event $\varepsilon_i$. Lower distances are rated higher than larger distances. It ranks each event $\varepsilon_j$ by the length of the shortest walk between any of the nodes in $\varepsilon_j$ and any of those in $\varepsilon_i$. If there is more than one event with the same spatial distance, these events are ranked by their timestamp in decreasing order.
+    \item \textbf{Recent}: The recent selection strategy also bases its selection on the differing events. It ranks the events by their recency. The most recent event is rated the highest, and the oldest event is rated the lowest.
+    \item \textbf{1-delta}: The 1-delta selection strategy also operates on the differing events. However, it employs a more involved heuristic. It compiles a ranking of all events considered in the search $C(\mathcal{G}, \varepsilon_i, k, m_{max})$ before the first search iteration. For this ranking, it uses the link prediction function to calculate a separate prediction $pred_j$ for each of the candidate events $\varepsilon_j \in C(\mathcal{G}, \varepsilon_i, k, m_{max})$ as:
+    \begin{equation}
+        pred_j = f(\mathcal{G} \setminus \{\varepsilon_j\}, \varepsilon_i)
+    \end{equation}
+    The prediction $pred_j$ is the prediction for the explained instance when event $\varepsilon_j$ is omitted from the input. These predictions are then fed into the $\Delta$-function, ranking the candidate events in decreasing order by how much the prediction is shifted.
+\end{itemize}
+
+The function $\Delta(prediction_{orig}, prediction_j)$ determines how much a prediction $prediction_j$ is shifted towards being classified differently from the original prediction $prediction_{orig}$. The higher the result of this function, the more the prediction $prediction_j$ suggests a different outcome in the link prediction task.
+
+\begin{equation}
+    \Delta(prediction_{orig}, prediction_j) = 
+    \begin{cases}
+        prediction_{orig} - prediction_j,  &\text{if } prediction_{orig} \geq 0 \\
+        prediction_j - prediction_{orig},  &\text{else}
+    \end{cases}
+\end{equation}
+
+
+The different selection strategies represent separate heuristic perspectives on the task of ranking paths in the search tree. The 'closest' and 'recent' selection strategies leverage structural information. They are based on the intuition that events that are spatially and temporally close to the explained event are more important to the original prediction, and thus more likely to be part of a counterfactual explanation. In comparison, the '1-delta' strategy leverages the isolated impact of removing events separately for the ranking.  
+
+
+\subsection{Greedy Counterfactual Explainer for Models on Dynamic Graphs}
+\label{s_Methodology_GreedyCF}
+
+\acrfull{greedycf} provides a straightforward approach for searching for counterfactual examples in the search space. It aims to keep computations to a minimum in order to quickly conclude. The search approach revolves around a greedy strategy for traversing the search space.
+
+The algorithm iteratively constructs an explanation $\mathcal{X} \in \hat{S}_{\varepsilon_i}$ to explain the prediction for the potential future edge addition event $\varepsilon_i$. The algorithm is depicted in Algorithm \ref{a_GreedyCF}. Before the first iteration, the candidate events $C$, the explanation set $\mathcal{X}$, and a variable tracking the prediction of the previous iteration are initialized. The first step in each search iteration is to sample $l$ events from $C$ that rank highest according to a selection strategy $\delta$. \gls{greedycf} uses one of the selection strategies to inform the selection process. Next, the link prediction function is used to infer a prediction $f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i)$ for each of the sampled events $\varepsilon_j$. The prediction reflects what the link prediction function predicts when each sampled event $\varepsilon_j$ is removed from the past events in addition to the events already in $\mathcal{X}$. Subsequently, the event that, when excluded, shifts the prediction most towards a counterfactual prediction is selected as the best event $\varepsilon_{best}$. This selection is based on the $\Delta$-function introduced in Section \ref{s_Methodology_SelectionStrategies}, selecting the event from the $sample$ that shifts the prediction most towards changing signs:
+
+\begin{equation}
+    \argmax_{\varepsilon_j \in sample} \Delta(prediction_{orig}, f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i))
+\end{equation}
+
+If removing event $\varepsilon_{best}$ shifts the prediction further than only removing $\mathcal{X}$, the event is added to the explanation set $\mathcal{X}$. If the current prediction is counterfactual to the original prediction, the search concludes, returning the counterfactual example. If removing event $\varepsilon_{best}$ does not shift the prediction farther, the search also concludes, returning all the events found up to this point, that shift the prediction towards being counterfactual. Otherwise, the search continues with a new iteration.
+
+{
+\setlength{\algomargin}{1.25em}
+\small
+\begin{algorithm}[ht]
+\caption{Greedy search algorithm for counterfactual examples.}
+\label{a_GreedyCF}
+    \KwIn{$\hspace{1.5mm} f, \hspace{1.5mm} \mathcal{G}, \hspace{1.5mm} \varepsilon_i$, $\delta$, $prediction_{orig}, l$}
+    \KwOut{best explanation found}
+    $C \gets C(\mathcal{G}, \varepsilon_i, k, m_{max})$\;
+    $\mathcal{X} \gets \varnothing$\;
+    $prediction_{prev} \gets prediction_{orig}$\;
+    \While{there are elements in $C$ that are not yet part of $\mathcal{X}$}{
+        $sample \gets$ $l$ highest rated events from $C \setminus \mathcal{X}$ according to policy $\delta$\;
+        $\varepsilon_{best} \gets \argmax_{\varepsilon_j \in sample} \Delta(prediction_{orig}, f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i))$\;
+        $prediction_{current} \gets f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_{best}\}), \varepsilon_i)$\;
+        \uIf{$\Delta(prediction_{prev}, prediction_{current}) > 0$}{
+            \tcc{appending $\varepsilon_{best}$ to $\mathcal{X}$ shifts the prediction further towards the opposite of the original prediction}
+            $\mathcal{X} \gets \mathcal{X} \cup \varepsilon_{best}$\;
+            \If{$\Delta(prediction_{orig}, prediction_{current}) > |prediction_{orig}|$}{
+                \tcc{$\mathcal{X}$ is a counterfactual example}
+                \Break\;
+            }
+        }\Else{
+            \Break\;
+        }
+        $prediction_{prev} \gets prediction_{current}$\;
+    }
+    \KwRet{$\mathcal{X}$}
+\end{algorithm}
+}
+
+\begin{figure}[ht]
+    \centering
+    \include{figures/methodology/greedy_baseline_example}
+    \caption{Example for the operation of the \gls{greedycf} approach.}
+    \label{f_GreedyBaseline}
+\end{figure}
+
+Figure \ref{f_GreedyBaseline} shows a simplified schema for how \gls{greedycf} operates. In the figure, each iteration consists of sampling $l = 3$ past events using the selection strategy $\delta$. The prediction gets lower in each iteration until it reaches a negative value in the third iteration. When this negative prediction is reached, the search concludes, returning the counterfactual example $\mathcal{X} = \{\varepsilon_2, \varepsilon_1, \varepsilon_5\}$.
+
+
+
+\subsection{Counterfactual Explanations for Deep Graph Models on Dynamic Graphs}
+\label{s_Methodology_CoDy}
 % Add discussion of the complexity to follow up on the previous sections
-\gls{cftgnn} adapts its search algorithm mainly from \gls{mcts} \cite{kocsis_bandit_2006, silver_mastering_2017}. This algorithm has been successfully applied to playing games \cite{silver_mastering_2017} and planning problems \cite{browne_survey_2012}. Recently, it has also been applied for factual explanations on static \glspl{gnn} \cite{yuan_explainability_2021, zhang_gstarx_2022} and \glspl{tgnn} \cite{xia_explaining_2023}. 
+\acrfull{cftgnn} adapts its search algorithm mainly from \gls{mcts} \cite{kocsis_bandit_2006, silver_mastering_2017}. The \gls{mcts} algorithm has been successfully applied to playing games \cite{silver_mastering_2017} and planning problems \cite{browne_survey_2012}. Recently, it has also been used for factual explanations on static \glspl{gnn} \cite{yuan_explainability_2021, zhang_gstarx_2022} and \glspl{tgnn} \cite{xia_explaining_2023}. 
 
-Analogously to \gls{mcts}, the search algorithm of \gls{cftgnn} explores and expands the search tree using the results of previous explorations as a guide \cite{browne_survey_2012}. The search operates in iterations, each iteration growing the search tree by one more node. It concludes after a predefined number of maximum iterations $it_{max}$ or when the entire search tree has been explored. At the end of the search, the algorithm selects the node associated with the minimal counterfactual example or a fallback option if no counterfactual example has been found. This fallback is introduced in Section \ref{s_Methodology_Search_Fallback}. One search iteration consists of the same steps as search iterations in \gls{mcts} \cite{browne_survey_2012}: Selection, Simulation, Expansion, and Backpropagation. However, the exact implementation of these steps differs from their \gls{mcts} counterparts.
+Analogously to \gls{mcts}, the search algorithm of \gls{cftgnn} explores and expands the search tree using the results of previous explorations as a guide \cite{browne_survey_2012}. The search operates in iterations, each iteration growing the search tree by one more node. It concludes after a predefined number of maximum iterations $it_{max}$ or when the entire search tree has been explored. At the end of the search, the algorithm selects the node associated with the minimal counterfactual example or a fallback option if no counterfactual example has been found. This fallback is introduced in Section \ref{s_Methodology_CoDy_Fallback}. One search iteration consists of the same steps as the search iterations in \gls{mcts} \cite{browne_survey_2012}: Selection, Simulation, Expansion, and Backpropagation. However, the exact implementation of these steps differs from their \gls{mcts} counterparts.
 
 {
 \setlength{\algomargin}{1.25em}
@@ -86,14 +191,14 @@ Analogously to \gls{mcts}, the search algorithm of \gls{cftgnn} explores and exp
 \begin{algorithm}[ht]
 \caption{Search algorithm used by \gls{cftgnn}.}
 \label{a_MCTS_Main}
-    \KwIn{$f(\cdot), \hspace{1.5mm} \mathcal{G}, \hspace{1.5mm} \varepsilon_i, \hspace{1.5mm} it_{max}, \hspace{1.5mm} \delta$}
+    \KwIn{$f, \hspace{1.5mm} \mathcal{G}, \hspace{1.5mm} \varepsilon_i, \hspace{1.5mm} it_{max}, \hspace{1.5mm} \delta$}
     \KwOut{best explanation found}
     $prediction_{orig} \gets f(\mathcal{G}(t_i), \varepsilon_i)$\;
     $n_{root} \gets (\varnothing, null, null, \varnothing, 0, null, 1)$\;
     $it \gets 0$\;
     \While{$it < it_{max}$ and $n_{root}$ is selectable}{
         $n_{selected} \gets \mathrm{\textbf{select}}(n_{root}, \delta)$\;
-        $\mathrm{\textbf{simulate}}(n_{selected}, f(\cdot), \mathcal{G}, \varepsilon_i)$\;
+        $\mathrm{\textbf{simulate}}(n_{selected}, f, \mathcal{G}, \varepsilon_i)$\;
         $\mathrm{\textbf{expand}}(n_{selected}, prediction_{orig})$\;
         $\mathrm{\textbf{backpropagate}}(n_{selected})$\;
         $it \gets it + 1$\;
@@ -103,27 +208,33 @@ Analogously to \gls{mcts}, the search algorithm of \gls{cftgnn} explores and exp
 \end{algorithm}
 }
 
-Algorithm \ref{a_MCTS_Main} provides a high-level overview of the search algorithm. The algorithm takes the link prediction function $f(\cdot)$, the dynamic graph $\mathcal{G}$, and a potential future future edge addition event $\varepsilon_i$ as input. Additionally, the algorithm is provided with a maximum number of iterations $it_{max}$. The algorithm first computes the original prediction $prediction_{orig}$ and initializes the root node $n_{root}$ of the search tree. The search itself occurs in iterations, up to a predefined maximum number of iterations or until the search tree is fully explored. In each iteration a node in the search tree is selected. Next the prediction associated with the perturbation of this node is computed. Then the node is expanded, and finally the results are propagated upwards through the search tree. The search concludes by selecting the input perturbation that provides the best counterfactual explanation of the prediction. The inner workings of these steps are subject of the following sections.
+Algorithm \ref{a_MCTS_Main} provides a high-level overview of the search algorithm. The algorithm takes the link prediction function $f$, the dynamic graph $\mathcal{G}$, and a potential future future edge addition event $\varepsilon_i$ as input. Additionally, the algorithm is provided with a maximum number of iterations $it_{max}$. The algorithm first computes the original prediction $prediction_{orig}$ and initializes the root node $n_{root}$ of the search tree. The search itself operates in iterations. It concludes after $it_{max}$ iterations or when the search tree is fully explored. At the start of each iteration, a node in the search tree is selected. Next, the prediction associated with the perturbation of this node is computed. Then, the node is expanded, and finally the results are propagated upwards through the search tree. The search concludes by selecting the input perturbation that provides the best counterfactual explanation of the prediction. The inner workings of these steps are subject of the following sections.
 
 
 \subsubsection{Selection}
-\label{s_Methodology_Search_Selection}
+\label{s_Methodology_CoDy_Selection}
 % The selection process starts at the root node and then recursively applies a child selection policy to traverse the tree until an expandable node is reached. A node is expandable if it has not yet undergone expansion, meaning that it does not have any child nodes and has yet to be associated with a prediction score.
 The first step in each search iteration is the selection of a new node to expand. The selection procedure initiates from the root node and subsequently employs a recursive child selection policy to traverse the tree structure until encountering a node suitable for expansion. A node qualifies for expansion if it has not yet undergone the expansion process, implying that it lacks child nodes and has not yet been associated with a prediction score.
 
-The child selection algorithm aims to balance the exploration of the search tree with the exploitation of already-known promising areas of the search tree. From an expanded node in the search tree $n_j$, the selection hinges on a score $selection\_score(n_k)$ calculated for all selectable children $selectable\_children(n_j) = \{n_k: n_k \in children_j, \hspace{1.5mm} selectable_k = 1\}$. The child that has the highest score is selected.
+The child selection algorithm aims to balance the exploration of the search tree with the exploitation of already-known promising paths through the search tree. From an expanded node in the search tree $n_j$, the selection hinges on a score $selection\_score(n_k)$ calculated for all selectable children:
+
+\begin{equation}
+    selectable\_children(n_j) = \{n_k: n_k \in children_j, \hspace{1.5mm} selectable_k = 1\}
+\end{equation}
+
+The child node $n_k$ out of the selectable children that has the highest score $selection\_score(nk)$ is selected.
 
 \begin{equation}
     \argmax_{n_k \in selectable\_children(n_j)} selection\_score(n_k)
 \end{equation}
 
-This selection score combines the exploitation score $score_j$ associated with the node with an exploration score $score_{exploration}(n_j)$ calculated based on its level of past exploration.
+This selection score combines the exploitation score $score_j$ associated with the node $n_j$ with an exploration score $score_{exploration}(n_j)$, which is calculated based on the node's level of past exploration.
 
 \begin{equation}
     selection\_score(n_j) = \alpha * score_j + \beta * score_{exploration}(n_j)
 \end{equation}
 
-Here, $\alpha$ and $\beta$ are tunable hyperparameters that tune the balance between the two terms. The exploitation term $\alpha * score(n_j)$ encourages selecting nodes already associated with a high score. In contrast, the exploration term $\beta * score_{exploration}(n_j)$ promotes the exploration of nodes with little past selections.
+Here, $\alpha$ and $\beta$ are tunable hyperparameters that adjust the balance between the two terms. The exploitation term $\alpha * score(n_j)$ encourages selecting nodes already associated with a high score. In contrast, the exploration term $\beta * score_{exploration}(n_j)$ promotes the exploration of nodes with little past selections.
 
 The exploration score is adapted from the 'Upper Confidence Bound 1' introduced by \cite{auer_finite-time_2002}, which is popular across various \gls{mcts} implementations \cite{kocsis_bandit_2006, browne_survey_2012}. For a node $n_j$ with parent $n_p = parent_j$, the score is defined as:
 
@@ -133,9 +244,7 @@ The exploration score is adapted from the 'Upper Confidence Bound 1' introduced 
 
 This score $score_{exploration}(n_j)$ quantifies the uncertainty about selecting node $n_j$ \cite{auer_finite-time_2002, browne_survey_2012}. A higher exploration score means that less is known about the potential impact on the prediction that follows from selecting this node.
 
-If more than one child node has the same score, a so-called selection strategy $\delta$ is used to select a child. For example, this happens when none of the children of a node have been expanded and are thus associated with the same score. Different selection policies are presented in Section \ref{s_Methodology_Selection}. 
-
-The complete selection process is described in Algorithm \ref{a_MCTS_Select}, which recursively explores the search tree following the described procedure.
+If more than one child node has the same score, a selection strategy $\delta$ is used to select a child. This selection strategy can be any of the selection strategies introduced in Section \ref{s_Methodology_SelectionStrategies}. For example, the selection strategy is used when none of the children of a node have been expanded and are thus associated with the same score. The complete selection process is described in Algorithm \ref{a_MCTS_Select}, which recursively explores the search tree following the outlined procedure.
 
 {
 \setlength{\algomargin}{1.25em}
@@ -152,7 +261,7 @@ The complete selection process is described in Algorithm \ref{a_MCTS_Select}, wh
     %}
     $n_{best} \gets \argmax_{n_k \in \hspace{1mm} selectable\_children(n_j)} selection\_score(n_k)$\;
     \If{there is more than one child with the highest selection score}{
-        $n_{best} \gets$ the best child according to selection strategy $\delta$\;
+        $n_{best} \gets$ highest ranking child node according to selection strategy $\delta$\;
     }
     return $\textbf{select}(n_{best})$\;
     }
@@ -161,8 +270,8 @@ The complete selection process is described in Algorithm \ref{a_MCTS_Select}, wh
 
 
 \subsubsection{Simulation}
-\label{s_Methodology_Search_Simulation}
-The next step after selecting a node $n_j$ is the simulation. This step consists of making a call to the link prediction function $f(\cdot)$ to infer the prediction associated with the node. The prediction $prediction_j$ associated with the selected node $n_j$ is calculated as the prediction for the explained event $\varepsilon_i$ given that the events in the perturbation set $s_j$ associated with node $n_j$ are removed from the set of past events. 
+\label{s_Methodology_CoDy_Simulation}
+The next step after selecting a node $n_j$ is referred to as simulation. This step consists of making a call to the link prediction function $f$ to infer the prediction associated with the node. The prediction $prediction_j$ associated with the selected node $n_j$ is calculated as the prediction for the explained event $\varepsilon_i$ given that the events in the perturbation set $s_j$ associated with node $n_j$ are removed from the set of past events. 
 
 \begin{equation}
     prediction_j = f(\mathcal{G}(t_i) \setminus s_j, \varepsilon_i)
@@ -176,7 +285,7 @@ This culminates in Algorithm \ref{a_MCTS_Simulate}, which infers the associated 
 \begin{algorithm}[ht]
 \caption{Algorithm for simulating the link prediction on the selected node.}
 \label{a_MCTS_Simulate}
-    \Fn{\textbf{simulate}($n_j$, $f(\cdot)$, $\mathcal{G}$, $\varepsilon_i$)}{
+    \Fn{\textbf{simulate}($n_j$, $f$, $\mathcal{G}$, $\varepsilon_i$)}{
     $prediction_j \gets f(\mathcal{G}(t_i) \setminus s_j, \varepsilon_i)$\;
     return $prediction_j$\;
     }
@@ -184,49 +293,42 @@ This culminates in Algorithm \ref{a_MCTS_Simulate}, which infers the associated 
 }
 
 \subsubsection{Expansion}
-\label{s_Methodology_Search_Expansion}
+\label{s_Methodology_CoDy_Expansion}
 
-The expansion takes the selected node $n_j$ after the simulation and updates its attributes. The exploitation score $score_j$ is initialized as the relative size of the shift between the original prediction score $prediction_{orig}$ and the prediction score associated with the expanded node $prediction_j$. If this value is negative, the exploitation score is set to $0$. 
+Following the simulation, the expansion phase involves updating the attributes of the selected node $n_j$. The exploitation score $score_j$ is initialized as the relative magnitude of the shift between the original prediction score $prediction_{orig}$ and the prediction score linked to the expanded node $prediction_j$. If this value is negative, the exploitation score is set to $0$. 
 
 \begin{equation}
     \label{e_MCTS_score}
     score_j \gets \max\left(0, \frac{\Delta(prediction_{orig}, prediction_j)}{|prediction_{orig}|}\right)
 \end{equation}
 
-Here, the function $\Delta(prediction_{orig}, prediction_j)$ calculates the difference between $prediction_{orig}$ and $prediction_j$ in the direction of a contrary prediction. The higher the result of this function, the more the prediction associated with node $n_j$ suggests a different outcome of the link prediction task.
+The $\Delta$-function introduced in Section \ref{s_Methodology_SelectionStrategies} is reused here. If the initial score defined in \ref{e_MCTS_score} is greater than $1$, that signifies that the link prediction associated with node $n_j$ is classified differently from the original link prediction.
+
+In addition to calculating the score, the expansion step also adds a set of children to the selected node. As discussed in Section \ref{s_Methodology_SearchSpace}, each node $n_j \in T$ is primarily defined by its associated set of perturbations $s_j$. Let $n_k$ be a node in the search tree, associated with the perturbations $s_k$. Then, each input perturbation $s_l$ that satisfies the following constraints serves as the basis for a valid child node to $n_k$:
 
 \begin{equation}
-    \Delta(prediction_{orig}, prediction_j) = 
-    \begin{cases}
-        prediction_{orig} - prediction_j,  &\text{if } prediction_{orig} \geq 0 \\
-        prediction_j - prediction_{orig},  &\text{else}
-    \end{cases}
-\end{equation}
-
-Looking back at the initial score defined in \ref{e_MCTS_score}, a score greater than $1$ signifies that the link prediction associated with node $n_j$ is classified differently from the original link prediction.
-
-In addition to calculating the score, the expansion step also adds a set of children to the selected node. As discussed in Section \ref{s_Methodology_Overview_Search}, each node $n_j \in T$ is primarily defined by its associated set of perturbations $s_j$. Let $n_k$ be a node in the search tree, associated with the perturbations $s_k$. Then, each input perturbation $s_j$ that satisfies the following constraints serves as the basis for a valid child node to $n_k$:
-
-\begin{equation}
-    s_k \in \hat{S}_{\varepsilon_j}
+    \label{e_child_1}
+    s_j \in \hat{S}_{\varepsilon_j}
 \end{equation}
 
 \begin{equation}
-    s_j \subset s_k
+    \label{e_child_2}
+    s_k \subset s_j
 \end{equation}
 
 \begin{equation}
+    \label{e_child_3}
     |s_k| = |s_j| + 1
 \end{equation}
 
-Thus, a new node is initialized for each of the input perturbations that satisfy these constraints. These new nodes are then associated with their parent node $n_j$:
+This means that any child node $n_j$ to a parent node $n_k$ has to be associated with a input perturbation $s_j$ that is part of the search space (Equation \ref{e_child_1}), that includes all the events in the input perturbation $s_k$ associated with its parent (Equation \ref{e_child_2}), and that includes one more event than $s_k$ (Equation \ref{e_child_3}). New child nodes are initialized for each of the input perturbations that satisfies these constraints. These new nodes are then associated with their parent node $n_j$:
 
 
 \begin{equation}
     children_j \gets \{(s_k, null, n_j, \varnothing, 0, null, 1): s_k \in \hat{S}_{\varepsilon_i} \hspace{1.5mm} \mathrm{with} \hspace{1.5mm} |s_k| = |s_j| + 1, s_j \subset s_k\}
 \end{equation}
 
-The child nodes are initialized with $null$ values for their prediction and score attributes, and an empty set of child nodes. These attributes are only assigned once a child node is selected and expanded itself.
+The child nodes are initialized with $null$ values for their prediction and score attributes, and an empty set of child nodes. These attributes are only assigned once any of these nodes is selected and expanded themselves.
 
 The expansion step is summarized in Algorithm \ref{a_MCTS_Expand}. After assigning the initial score, it checks whether the prediction associated with the node is counterfactual to the original prediction. If so, the algorithm concludes and sets the selectable flag $selectable_j$ to $0$, which prevents future selections of node $n_j$. It would not make sense to select $n_j$ again, as it already constitutes a counterfactual example. Further deepening the search tree from node $n_j$ could only encounter counterfactual examples with higher complexity, violating the objective of minimizing complexity. If the node is not associated with a counterfactual example, its children are initialized.
 
@@ -251,7 +353,7 @@ The expansion step is summarized in Algorithm \ref{a_MCTS_Expand}. After assigni
 }
 
 \subsubsection{Backpropagation}
-\label{s_Methodology_Search_Backpropagation}
+\label{s_Methodology_CoDy_Backpropagation}
 
 Backpropagation is the last step in the search iteration. It serves to update information in the search tree starting at the parent $n_p$ of the expanded node $n_j$, recursively traversing backward through the search tree until the root node is reached. The backpropagation increments the number of selections by one, updates the exploitation score, and checks if the node is still selectable.
 
@@ -267,7 +369,7 @@ The exploitation score of a node $n_j$ is updated to a weighted average of its i
 
 This score estimates the potential for finding a counterfactual example among the descendants of node $n_j$. The more a node is selected, the more accurate its estimation should become. Thus, the scores are weighted by the number of selections. 
 
-Algorithm \ref{a_MCTS_Backpropagation} presents the full backpropagation procedure. For easier readability, the update of the exploitation score is presented over lines 3-6. The backpropagation also checks if any of the child nodes is selectable. If no child node is selectable, the search tree is fully expanded from that node forward, thus the node is marked as not selectable itself. The backpropagation concludes when it reaches the root node.
+Algorithm \ref{a_MCTS_Backpropagation} presents the full backpropagation procedure. For easier readability, the update of the exploitation score is presented over lines 3-6. The backpropagation also checks if any of the child nodes is selectable. If no child node is selectable, the search tree is fully expanded from that node forward. Thus, the node is marked as not selectable itself. The backpropagation concludes when it reaches the root node.
 
 {
 \setlength{\algomargin}{1.25em}
@@ -290,8 +392,10 @@ Algorithm \ref{a_MCTS_Backpropagation} presents the full backpropagation procedu
 \end{algorithm}
 }
 
+
+
 \subsubsection{Explanation Selection and Fallback}
-\label{s_Methodology_Search_Fallback}
+\label{s_Methodology_CoDy_Fallback}
 After the search iterations have concluded, the best counterfactual explanation is selected. This is trivial when exactly one counterfactual example has been encountered during the search. If multiple counterfactual examples were encountered, the best of them is selected according to the search objectives. When the search did not find any counterfactual examples, a fallback strategy is invoked that provides the next best explanation.
 
 Selecting the best counterfactual example amongst several candidate examples \(cf\_examples\) involves rating the candidates according to the objective of minimizing complexity. Accordingly, only the examples $n_j \in cf\_examples$ with the least number of associated perturbations $s_j$ are considered:
@@ -335,7 +439,7 @@ These strategies are integrated into Algorithm \ref{a_MCTS_ResultSelection}. If 
 
 
 \subsubsection{Search Optimizations}
-\label{s_Methodology_Search_Optimizations}
+\label{s_Methodology_CoDy_Optimizations}
  While the principles behind the search algorithm presented in the previous section provide a good basis for searching for counterfactual examples, the search performance is further optimized. \gls{cftgnn} employs dynamic constraints on the search tree to minimize the complexity of explanations. Additionally, caching is used to minimize redundant computations, and an approximation approach is utilized to significantly speed up the inference time of the link prediction function.
 
  \gls{cftgnn} aims to find a counterfactual example with the lowest complexity possible. When the search algorithm encounters a node associated with a counterfactual example $n_j$, any other node associated with a counterfactual example $n_k$ with a higher complexity than $n_j$ would be considered worse than $n_j$. Thus, the search should not explore nodes in the search tree associated with perturbations that have a higher complexity than $n_j$. \gls{cftgnn} implements this dynamic constraint on exploring the search tree by modifying the search tree once a node $n_j$ associated with a counterfactual example is expanded. This is done by marking all nodes $n_k \in T$ with $|s_k| = |s_j|$ as not selectable $selectable_k = 0$ and then updating the selectability attribute of all nodes $n_l$ with lower complexity $|s_l| < |s_j|$ the same way as in the backpropagation step (see Algorithm \ref{a_MCTS_Backpropagation}). Additionally, newly expanded nodes $n_k$ with the same complexity as $n_j$ are marked as non-selectable, regardless of whether they constitute a counterfactual example.
@@ -365,7 +469,7 @@ Only if the approximation $prediction_l^{approximation}$ suggests that the input
 This two-stage approach substantially speeds up the search process while keeping the results accurate by confirming potential counterfactuals.
 
 \subsubsection{An Example of the Search}
-\label{s_Methodology_Search_Example}
+\label{s_Methodology_CoDy_Example}
 
 Figure \ref{f_search_example} exemplifies the operations of the search algorithm. It depicts the search in a search tree where the candidate events $C(\mathcal{G}, \varepsilon_i, k, m_{max})$ only consist of three past events $\varepsilon_1, \varepsilon_2, \varepsilon_3$. Following along the search algorithm, in the first iteration the root node is selected. 
 \begin{figure}[ht!]
@@ -377,90 +481,14 @@ Figure \ref{f_search_example} exemplifies the operations of the search algorithm
 Simulating on it produces the original prediction score, which is $3.179$ in this case. This score means that the potential future edge addition event $\varepsilon_i$ is classified to occur. The expansion step in the first iteration adds new child nodes to the root, one for each of the candidate events. Let $s_1 = \{\varepsilon_1\}, s_2 = \{\varepsilon_2\}, s_3 = \{\varepsilon_3\}$. Since none of the child nodes of the root have been explored to this point, the second iteration employs the selection strategy $\delta$ to select node $n_2$. After simulation, this node is expanded, adding two child nodes associated with the input perturbations $s_4 = \{\varepsilon_1, \varepsilon_2\}, s_5 = \{\varepsilon_2, \varepsilon_3\}$. Similarly, iteration $3$ selects node $n_5$. The expansion only adds a single child node associated with $s_6 = \{\varepsilon_1, \varepsilon_2, \varepsilon_3\}$. In iteration $4$, the newly added child node $n_6$ is selected. Since it has no children, backpropagation marks the node as no longer selectable. The same applies to its parent node $n_5$. In iteration $5$, the exploration score associated with the unexplored children of the root node is large enough, so that $n_2$ is no longer selected over the unexplored alternatives. Thus, $\delta$ is applied, resulting in the selection of node $n_1$. The simulation of $n_1$ yields a negative score, meaning that its associated perturbation constitutes a counterfactual example. Following the optimization of dynamic constraints on the search space, all nodes associated with a perturbation set that contains more than one element are marked as no longer selectable. In this instance, this applies to node $n_4$. Marking node $n_4$ as not selectable also makes node $n_2$ no longer selectable, since none if its children remain selectable. Thus, in the final iteration node $n_3$ is selected as the only option. After this iteration, none of the nodes remain selectable, meaning that the search tree is fully explored and the search can conclude. As node $n_1$ is the only node associated with a counterfactual example, it is selected as the best node and the input perturbation $s_1 = \{\varepsilon_1\}$ is returned as the minimal counterfactual example.
 
 \FloatBarrier
-
-\subsection{Node Selection Strategies}
-\label{s_Methodology_Selection}
-% Detail the different selection strategies, how they work and what the reasoning behind them is
-
-Heuristic selection strategies are used to inform the selection process in choosing an alternative within the nodes that have not yet been expanded. This has the aim of improving the search performance by exploring promising alternatives first. Let $A = {n_1,...,n_k}$ be the set of alternative nodes in the search tree that could be selected. The sets of perturbations associated with each of these nodes differ by exactly one event. Let $\varepsilon_1, ..., \varepsilon_k$ be the single events that differ between the respective nodes. The selection strategies provide a ranking of different nodes based on these differing events.
-
-\begin{itemize}
-    \item \textbf{Random}: The random selection strategy serves as the baseline strategy. It selects a node $n_j \in A$ at random.
-    \item \textbf{Closest}: The closest selection strategy bases its selection on the differing events. It ranks the events based on their spatial distance to the explained event $\varepsilon_i$. It selects the event $\varepsilon_j$ with the shortest walk between any of the nodes in $\varepsilon_j$ and any of those in $\varepsilon_i$. If there is more than one event with the shortest spatial distance, the event among these closest events that is associated with the most recent timestamp is selected. Finally, the selection strategy selects the respective node.
-    \item \textbf{Recent}: The recent selection strategy also bases its selection on the differing events. It ranks the events by recency and selects the node corresponding to the highest-ranking event.
-    \item \textbf{1-best}: The 1-best selection strategy also operates on the differing events. However, it employs a more involved heuristic. It compiles a ranking of all events considered in the search $C(\mathcal{G}, \varepsilon_i, k, m_{max})$ before the first search iteration. For this ranking, it uses the link prediction function to calculate a separate prediction $pred_j$ for each of the candidate events $\varepsilon_j \in C(\mathcal{G}, \varepsilon_i, k, m_{max})$ as:
-    \begin{equation}
-        pred_j = f(\mathcal{G} \setminus \{\varepsilon_j\}, \varepsilon_i)
-    \end{equation}
-    These predictions are then fed into the $\Delta$-function, ranking the candidate events along the output of this function.
-\end{itemize}
-
-
-
-\subsection{Greedy heuristic as baseline}
-\label{s_Methodology_GreedyBaseline}
-
-Since \gls{cftgnn} is the first explanation approach that provides counterfactual explanations for predictions on dynamic graphs, it is difficult to assess its performance. Thus, a simple baseline approach is used as reference point for the assessment. This baseline searches for a counterfactual example using a greedy heuristic. 
-
-The algorithm iteratively constructs an explanation $\mathcal{X} \in \hat{S}_{\varepsilon_i}$ to explain the prediction for the potential future edge addition event $\varepsilon_i$. The algorithm is depicted in Algorithm \ref{a_GreedyCF}. Before the first iteration, the candidate events $C$, the explanation set $\mathcal{X}$, and a variable tracking the prediction of the previous iteration are initialized. The first step in each search iteration is to sample $l$ events from $C$ that rank highest according to a selection strategy $\delta$. The baseline search uses the same selection strategies as \gls{cftgnn}, allowing for a more precise perspective on the influence of the search algorithm. Next, the link prediction function is used to infer a prediction $f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i)$ for each of the sampled events $\varepsilon_j$. The prediction reflects what the link prediction function predicts when each sampled event $\varepsilon_j$ is removed from the past events in addition to the events already in $\mathcal{X}$. Subsequently, the event that, when excluded, shifts the prediction most towards a counterfactual prediction is selected as best event $\varepsilon_{best}$. This selection is based on the $\Delta$-function introduces in Section \ref{s_Methodology_Search_Expansion}, selecting the event from the $sample$ that satisfies:
-
-\begin{equation}
-    \argmax_{\varepsilon_j \in sample} \Delta(prediction_{orig}, f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i))
-\end{equation}
-
-If removing event $\varepsilon_{best}$ shifts the prediction further than only removing $\mathcal{X}$, the event is added to the explanation set $\mathcal{X}$. If the current prediction is counterfactual to the original prediction, the search concludes, returning the counterfactual example. If removing event $\varepsilon_{best}$ does not shift the prediction further, the search also concludes, returning all the events found up to this point, that shift the prediction towards being counterfactual. Otherwise the search continues with a new iteration.
-
-{
-\setlength{\algomargin}{1.25em}
-\small
-\begin{algorithm}[ht]
-\caption{Greedy search algorithm for counterfactual examples.}
-\label{a_GreedyCF}
-    \KwIn{$\hspace{1.5mm} f(\cdot), \hspace{1.5mm} \mathcal{G}, \hspace{1.5mm} \varepsilon_i$, $\delta$, $prediction_{orig}, l$}
-    \KwOut{best explanation found}
-    $C \gets C(\mathcal{G}, \varepsilon_i, k, m_{max})$\;
-    $\mathcal{X} \gets \varnothing$\;
-    $prediction_{prev} \gets prediction_{orig}$\;
-    \While{there are elements in $C$ that are not yet part of $\mathcal{X}$}{
-        $sample \gets$ $l$ highest rated events from $C \setminus \mathcal{X}$ according to policy $\delta$\;
-        $\varepsilon_{best} \gets \argmax_{\varepsilon_j \in sample} \Delta(prediction_{orig}, f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i))$\;
-        $prediction_{current} \gets f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_{best}\}), \varepsilon_i)$\;
-        \uIf{$\Delta(prediction_{prev}, prediction_{current}) > 0$}{
-            \tcc{appending $\varepsilon_{best}$ to $\mathcal{X}$ shifts the prediction further towards the opposite of the original prediction}
-            $\mathcal{X} \gets \mathcal{X} \cup \varepsilon_{best}$\;
-            \If{$\Delta(prediction_{orig}, prediction_{current}) > |prediction_{orig}|$}{
-                \tcc{$\mathcal{X}$ is a counterfactual example}
-                \Break\;
-            }
-        }\Else{
-            \Break\;
-        }
-        $prediction_{prev} \gets prediction_{current}$\;
-    }
-    \KwRet{$\mathcal{X}$}
-\end{algorithm}
-}
-
-\begin{figure}
-    \centering
-    \include{figures/methodology/greedy_baseline_example}
-    \caption{Caption}
-    \label{f_GreedyBaseline}
-\end{figure}
-
-
+\subsection{CoDy for Generic Graph Tasks}
+\label{s_Methodology_GenericGraphTasks}
 % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 % \subsection{CoDy for Generic Graph Tasks}
 % Like SubgraphX: How to adapt CoDy to other tasks like classification.
 % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+This thesis presents \gls{cftgnn} to explain predictions in the future link prediction context. However, \gls{cftgnn} is easily generalizable to explain graph models applied to diverse tasks, including but not limited to node classification or graph classification.
 
+In node classification, the explanation target is no longer an explained event but the classification $y_{i, t}$ of a node $n_i$ in graph $\mathcal{G}$ at time $t$. The main adaptation is replacing the link prediction function $f$ with a binary prediction function $c(\cdot)$ that provides a prediction of whether the node $n_i$ is of the same class $y_{i, t}$ as initially classified, given a perturbation of the past events. With this replacement \gls{cftgnn} can operate the same way as in the link prediction setting.
 
-% What story do I want to tell in the Methodology chapter? I want to take the readers on a journey through the scientific process that lead to the cftgnnexplainer approach; first covering what decisions were made, and why they were made, then covering the exact problem formulation. Then the baselines used could be covered, however I think it makes sense to put those into the evaluation section. Then introduce the CF-TGNNExplainer concept, explaining what the general framework is, why certain design decisions were taken and then go into more detail on the exact realisation of the different modules of the explainer.
-
-
-% What subchapters do I want to cover? First general introduction and high-level description. Then architectural overview, then go into more detail on the two main parts, the search algorithm and the ranking strategies. 
-
-
-
-% Why can we not just apply an explanation method proposed for static graphs in this context? Make a case for why it is necessary to develop a new type of explainer (should also be part of the introduction but here in more detail)
-
+For graph classification, the link prediction function must also be replaced by a binary prediction function, which predicts whether the graph is classified into the same class as it was initially or not. Additionally, the spatial constraints on the search space introduced in Section \ref{s_Methodology_SearchSpace_Constraints} cannot be applied and are thus lifted so that the search space is only constrained in the temporal dimension.

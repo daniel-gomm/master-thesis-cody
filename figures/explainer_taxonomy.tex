@@ -1,5 +1,5 @@
 \tikzset{
-  basic/.style  = {draw, rectangle},
+  basic/.style  = {draw, rectangle, minimum height=7.5mm, outer sep=0},
   root/.style   = {basic, thin, align=center},
   level 2/.style = {basic, thin, align=center, sibling distance=60mm, text width=10em},
   level 3/.style = {basic, thin, align=center, sibling distance=30mm, text width=10em},
@@ -19,16 +19,26 @@
         \node[below of = c32] (c33) {Surrogate};
         \node[below of = c33] (c34) {Perturbation};
 
-        \node[below of = c4, xshift=15pt] (c41) {Search based};
-        \node[below of = c41] (c42) {Heuristic based};
-        \node[below of = c42] (c43) {Learning based};
+        \node[right of = c34, text width=5em, xshift=2.5cm, yshift = 0.5cm] (c341) {Learning};
+        \node[below of = c341, text width=5em] (c342) {Search};
+
+        \node[below of = c4, xshift=15pt] (c41) {Perturbation};
+
+        \node[right of = c41, text width=5em, xshift=2.5cm, yshift = 0.5cm](c411){Learning};
+        \node[below of = c411, text width=5em](c412){Search};
 
         \node[below of = c2, xshift=15pt] (c21) {Generation};
     \end{scope}
 
+    \draw[->] (c34) -- (c341);
+    \draw[->] (c34) -- (c342);
+
+    \draw[->] (c41) -- (c411);
+    \draw[->] (c41) -- (c412);
+
     \foreach \value in {1,...,4}
         \draw[->] (c3.188) |- (c3\value.west);
-    \foreach \value in {1,2,3}
+    \foreach \value in {1}
         \draw[->] (c4.188) |- (c4\value.west);
     \foreach \value in {1}
         \draw[->] (c2.188) |- (c2\value.west);
