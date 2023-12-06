@@ -9,9 +9,9 @@
 }
 \begin{tikzpicture}[level 1/.style={sibling distance=80mm, level distance=30mm}, >=latex]
 \footnotesize
-    \node [root] (r) {$n_0 = (\varnothing, 0.98, null, \{n_1, n_2\}, 94, 0, 1)$}
+    \node [root] (r) {$n_0 = (\varnothing, 0.98, null, \{n_1, n_2,...\})$}
       child {
-        node [level 2] (n1) {$n_1 = (\{\varepsilon_1\}, 0.77, n_0, \{n_3, n_4\}, 57, 0.21, 1)$}
+        node [level 2] (n1) {$n_1 = (\{\varepsilon_1\}, 0.77, n_0, \{n_3, n_4,...\})$}
         child {
           node [level 3] (n11) {$n_3 = (\{\varepsilon_1, \varepsilon_2\}, 0.83, \dots)$}
         }
@@ -20,7 +20,7 @@
         }
       }
       child {
-        node [level 2] (n2) {$n_2 = (\{\varepsilon_{l}\}, 0.87, n_0, \{n_5, n_6\}, 11, 0.11, 1)$}
+        node [level 2] (n2) {$n_2 = (\{\varepsilon_{l}\}, 0.87, n_0, \{n_5, n_6,...\})$}
         child {
           node [level 3] (n21) {$n_5 = (\{\varepsilon_{l}, \varepsilon_1\}, 0.47, \dots)$}
         }

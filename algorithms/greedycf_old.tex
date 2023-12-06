@@ -1,0 +1,41 @@
+{
+\setlength{\algomargin}{1.25em}
+\small
+\begin{algorithm}[ht]
+\caption{Greedy search algorithm for counterfactual examples.}
+\label{a_GreedyCF}
+    \KwIn{Link prediction function $f$, input graph $\mathcal{G}$, explained event $\varepsilon_i$, selection strategy $\delta$, original prediction $prediction_{orig}$, number of nodes to sample in each iteration $l$}
+    %\KwIn{$\hspace{1.5mm} f, \hspace{1.5mm} \mathcal{G}, \hspace{1.5mm} \varepsilon_i$, $\delta$, $prediction_{orig}, l$}
+    \KwOut{best explanation found $\mathcal{X}$}
+    $C \gets C(\mathcal{G}, \varepsilon_i, k, m_{max})$\;
+    $\mathcal{X} \gets \varnothing$\;
+    $prediction_{prev} \gets prediction_{orig}$\;
+    \While{there are elements in $C$ that are not yet part of $\mathcal{X}$}{
+        $sample \gets$ $l$ highest rated events from $C \setminus \mathcal{X}$ according to policy $\delta$\;
+        $\varepsilon_{best} \gets \argmax_{\varepsilon_j \in sample} \Delta(prediction_{orig}, f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i))$\;
+        $prediction_{current} \gets f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_{best}\}), \varepsilon_i)$\;
+        \uIf{$\Delta(prediction_{prev}, prediction_{current}) > 0$}{
+            \tcc{appending $\varepsilon_{best}$ to $\mathcal{X}$ shifts the prediction further towards the opposite of the original prediction}
+            $\mathcal{X} \gets \mathcal{X} \cup \varepsilon_{best}$\;
+            \If{$\Delta(prediction_{orig}, prediction_{current}) > |prediction_{orig}|$}{
+                \tcc{$\mathcal{X}$ is a counterfactual example}
+                \Break\;
+            }
+        }\Else{
+            \Break\;
+        }
+        $prediction_{prev} \gets prediction_{current}$\;
+    }
+    \KwRet{$\mathcal{X}$}
+\end{algorithm}
+}
+
+
+
+The algorithm iteratively constructs an explanation $\mathcal{X} \in \hat{S}_{\varepsilon_i}$ to explain the prediction for the potential future edge addition event $\varepsilon_i$ following the iterative pruning approach in the search tree. The algorithm is depicted in Algorithm \ref{a_GreedyCF}. Before the first iteration, the candidate events $C$, the explanation set $\mathcal{X}$, and a variable tracking the prediction of the previous iteration are initialized. The first step in each search iteration is to sample $l$ events from $C$ that rank highest according to a selection strategy $\delta$. \gls{greedycf} uses one of the selection strategies to inform the selection process. Next, the link prediction function is used to infer a prediction $f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i)$ for each of the sampled events $\varepsilon_j$. The prediction reflects what the link prediction function predicts when each sampled event $\varepsilon_j$ is removed from the past events in addition to the events already in $\mathcal{X}$. Subsequently, the event that, when excluded, shifts the prediction most towards a counterfactual prediction is selected as the best event $\varepsilon_{best}$. This selection is based on the $\Delta$-function introduced in Section \ref{s_Methodology_SelectionStrategies}, selecting the event from the $sample$ that shifts the prediction most towards changing signs:
+
+\begin{equation}
+    \argmax_{\varepsilon_j \in sample} \Delta(prediction_{orig}, f(\mathcal{G}(t_i) \setminus (\mathcal{X} \cup \{\varepsilon_j\}), \varepsilon_i))
+\end{equation}
+
+If removing event $\varepsilon_{best}$ shifts the prediction further than only removing $\mathcal{X}$, the event is added to the explanation set $\mathcal{X}$. If the current prediction is counterfactual to the original prediction, the search concludes, returning the counterfactual example. If removing event $\varepsilon_{best}$ does not shift the prediction farther, the search also concludes, returning all the events found up to this point, that shift the prediction towards being counterfactual. Otherwise, the search continues with a new iteration.

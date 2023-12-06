@@ -7,7 +7,7 @@ This chapter provides a comprehensive evaluation of \gls{cftgnn}. To assess the 
 \subsection{Experimental Setup}
 \label{s_Evaluation_Setup}
 
-To ensure the replicability of the results of the evaluation, this section details the experimental setup used for evaluating \gls{cftgnn}. First, the datasets are introduced (Section \ref{s_Evaluation_Setup_Datasets}). Then, the metrics used to analyze the performance of the explainers are outlined (Section \ref{s_Evaluation_Setup_Metrics}). Section \ref{s_Evaluation_Setup_TargetModel} details the explained target model and its configuration. Next, the baselines that \gls{cftgnn} is evaluated against are presented (Section \ref{s_Evaluation_Setup_FactualBaselines}). After a brief discussion of the physical evaluation infrastructure (Section \ref{s_Evaluation_Setup_Infrastructure}), the configuration of the evaluated explainers is laid out (Section \ref{s_Evaluation_Setup_Explainer}). Lastly, the different conducted experiments are described (Section \ref{s_Evaluation_Setup_Experiments}).
+To ensure the replicability of the results of the evaluation, this section details the experimental setup used for evaluating \gls{cftgnn}. First, the datasets are introduced (Section \ref{s_Evaluation_Setup_Datasets}). Then, the metrics used to analyze the performance of the explainers are outlined (Section \ref{s_Evaluation_Setup_Metrics}). Section \ref{s_Evaluation_Setup_TargetModel} details the explained target model and its configuration. Next, the baselines that \gls{cftgnn} is evaluated against are presented (Section \ref{s_Evaluation_Setup_Explainers}). After a brief discussion of the physical evaluation infrastructure (Section \ref{s_Evaluation_Setup_Infrastructure}), the configuration of the evaluated explainers is laid out (Section ). Lastly, the different conducted experiments are described (Section \ref{s_Evaluation_Setup_Experiments}).
 
 \subsubsection{Datasets}
 \label{s_Evaluation_Setup_Datasets}
@@ -18,7 +18,7 @@ The first two datasets come from an online social network among students of the 
 
 The third dataset is called Wikipedia \cite{kumar_predicting_2019} and consists of events representing edits of Wikipedia pages. The edits are represented as attributed links between users and pages. Thus, the dataset is a bipartite graph. It encompasses the 1,000 most edited pages and a total of 8,227 users. The edges are associated with a feature vector that represents a conversion of the edit text into a \gls{liwc} \cite{pennebaker_linguistic_2001} feature vector. This vector encodes a quantitative analysis of the text in the page edit \cite{pennebaker_linguistic_2001}.
 
-\begin{table}[h]
+\begin{table}[ht]
     \centering
     \begin{tabular}{cccccc}
         \hline
