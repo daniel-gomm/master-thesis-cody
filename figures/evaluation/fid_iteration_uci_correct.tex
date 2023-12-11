@@ -12,7 +12,7 @@
 axis line style={darkslategray38},
 tick align=inside,
 x grid style={lightgray204},
-xlabel=\textcolor{darkslategray38}{Iterations},
+xlabel=\textcolor{darkslategray38}{Search iterations ($it_{max}$)},
 xmajorgrids,
 xmajorticks=true,
 xmin=-50, xmax=1200,
@@ -250,7 +250,7 @@ table {%
     yshift=-2.5mm,
     node font=\small,
 ] at ($ (fid iteration.below south) $) {
-     &\footnotesize \textit{random} &\footnotesize \textit{temporal} &\footnotesize \textit{spatio-temporal} &\footnotesize \textit{1-delta} \\
+     &\footnotesize \textit{random} &\footnotesize \textit{temporal} &\footnotesize \textit{spatio-temporal} &\footnotesize \textit{local-gradient} \\
     \footnotesize \gls{cftgnn} & \draw[forestgreen4416044,solid](-3mm,1.5mm) -- (3mm,1.5mm);  & \draw[darkorange25512714,solid](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[crimson2143940,solid](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[steelblue31119180,solid](-3mm,1.5mm) -- (3mm,1.5mm); \\
     
     \footnotesize \gls{greedycf} & \draw[forestgreen4416044,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[darkorange25512714,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[crimson2143940,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[steelblue31119180,dashed](-3mm,1.5mm) -- (3mm,1.5mm); \\
