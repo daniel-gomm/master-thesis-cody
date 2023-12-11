@@ -1,8 +1,10 @@
 % This file was created with tikzplotlib v0.10.1.
 \begin{tikzpicture}
 \footnotesize
+\definecolor{crimson2143940}{RGB}{214,39,40}
 \definecolor{darkorange25512714}{RGB}{255,127,14}
 \definecolor{darkslategray38}{RGB}{38,38,38}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
 \definecolor{lightgray204}{RGB}{204,204,204}
 \definecolor{steelblue31119180}{RGB}{31,119,180}
 
@@ -23,7 +25,7 @@ ymin=0, ymax=0.5,
 ytick style={color=darkslategray38},
 name=fid iteration
 ]
-\addplot [line width=1pt, darkorange25512714]
+\addplot [line width=0.48pt, darkorange25512714]
 table {%
 -1e-07 -5e-10
 0 0.075
@@ -77,7 +79,7 @@ table {%
 1174 0.425
 1200 0.425
 };
-\addplot [line width=1pt, steelblue31119180]
+\addplot [line width=0.48pt, steelblue31119180]
 table {%
 -1e-07 -5e-10
 0 0.17
@@ -111,14 +113,133 @@ table {%
 951 0.45
 1200 0.45
 };
-\addplot [line width=1pt, darkorange25512714, dashed]
+\addplot [line width=0.48pt, forestgreen4416044]
+table {%
+-1e-07 -5e-10
+2 0.005
+4 0.01
+7 0.02
+8 0.025
+9 0.035
+10 0.04
+12 0.045
+14 0.05
+15 0.065
+18 0.08
+19 0.085
+21 0.09
+23 0.1
+24 0.11
+25 0.115
+26 0.12
+29 0.125
+33 0.13
+34 0.135
+35 0.145
+38 0.15
+42 0.155
+43 0.16
+48 0.17
+50 0.175
+52 0.18
+56 0.185
+60 0.19
+62 0.2
+75 0.205
+76 0.215
+77 0.225
+81 0.23
+91 0.235
+94 0.24
+97 0.245
+102 0.25
+110 0.255
+114 0.26
+115 0.265
+130 0.275
+135 0.28
+190 0.285
+195 0.29
+196 0.295
+231 0.3
+258 0.305
+310 0.31
+364 0.315
+408 0.32
+428 0.325
+435 0.33
+490 0.335
+520 0.34
+580 0.345
+583 0.35
+591 0.355
+750 0.36
+761 0.365
+780 0.37
+873 0.375
+876 0.38
+892 0.385
+954 0.39
+1176 0.395
+1200 0.395
+};
+\addplot [line width=0.48pt, crimson2143940]
+table {%
+-1e-07 -5e-10
+0 0.105
+1 0.17
+2 0.23
+3 0.27
+5 0.285
+6 0.295
+7 0.305
+9 0.315
+11 0.325
+12 0.33
+16 0.335
+63 0.34
+64 0.35
+65 0.355
+66 0.375
+68 0.38
+70 0.385
+126 0.395
+127 0.4
+138 0.405
+146 0.41
+147 0.415
+150 0.42
+182 0.425
+184 0.43
+196 0.435
+269 0.44
+465 0.445
+765 0.45
+951 0.455
+1031 0.46
+1097 0.465
+1133 0.47
+1200 0.47
+};
+\addplot [line width=0.48pt, darkorange25512714, dashed]
 table {%
 -50 0.425
 1200 0.425
 };
-\addplot [line width=1pt, darkorange25512714]
+\addplot [line width=0.48pt, crimson2143940, dashed]
 table {%
-0 0.425
+-50 0.46
+1200 0.46
+};
+\addplot [line width=0.48pt, forestgreen4416044, dashed]
+table {%
+-50 0.05
+1200 0.05
+};
+\addplot [line width=0.48pt, steelblue31119180, dashed]
+table {%
+-50 0.285
+1200 0.285
 };
 \end{axis}
 
@@ -128,10 +249,11 @@ table {%
     anchor=north,
     yshift=-2.5mm,
     node font=\small,
-    column sep=1em
 ] at ($ (fid iteration.below south) $) {
-\footnotesize
-    GreedyCF-recent & \draw[darkorange25512714,dashed](-3mm,1mm) -- (3mm,1mm); &\footnotesize CoDy-recent & \draw[darkorange25512714](-3mm,1mm) -- (3mm,1mm); &\footnotesize CoDy-1-delta & \draw[steelblue31119180](-3mm,1mm) -- (3mm,1mm); \\
+     &\footnotesize \textit{random} &\footnotesize \textit{temporal} &\footnotesize \textit{spatio-temporal} &\footnotesize \textit{1-delta} \\
+    \footnotesize \gls{cftgnn} & \draw[forestgreen4416044,solid](-3mm,1.5mm) -- (3mm,1.5mm);  & \draw[darkorange25512714,solid](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[crimson2143940,solid](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[steelblue31119180,solid](-3mm,1.5mm) -- (3mm,1.5mm); \\
+    
+    \footnotesize \gls{greedycf} & \draw[forestgreen4416044,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[darkorange25512714,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[crimson2143940,dashed](-3mm,1.5mm) -- (3mm,1.5mm); & \draw[steelblue31119180,dashed](-3mm,1.5mm) -- (3mm,1.5mm); \\
 };
 
 \end{tikzpicture}

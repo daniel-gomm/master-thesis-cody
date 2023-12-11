@@ -1,41 +1,151 @@
-\section{Some Appendix}
-\subsection{Some subsection}
+\section{Appendix}
+
+
+\subsection{Overview of Symbols used in this Thesis}
+\label{s_Appendix_Symbols}
+
+\begin{table}
+    \centering
+    \begin{tabular}{lccl}
+          &Symbol& Description &Definition ? (ref)\\
+          Static Graphs&$G$&  Static Graph&\\
+          Static Graphs&$V$&  Set of nodes&\\
+          Static Graphs&$v_i \in V$&  Node from set of nodes $V$&\\
+          Static Graphs&$E$&  Multi-set of edges&\\
+          Static Graphs&$e_i \in E$&  Edge from multi-set of edges $E$&\\
+          Static Graphs&$W(v_0, v_n)$&  Walk between nodes $v_0$ and $v_n$&\\
+          Static Graphs&$A^{vertex}$&  Node attributes&\\
+          Static Graphs&$a^{vertex}_{v_i} \in A^{vertex}$&  Attributes of node $v_i$&\\
+          Static Graphs&$A^{edge}$&  Edge attributes&\\
+ Static Graphs& $a^{edge}_{e_i}$& Attributes of edge $e_i$&\\
+ Static Graphs& $N_k(v_i)$& $k$-hop-neighborhood of node $v_i$&\\
+ & & &\\
+ DTDGs& $\mathcal{G}$& Dynamic graph&\\
+ DTDGs& $t$& Timestep&\\
+ DTDGs& $G_t$& Static snapshot of the dynamic graph&\\
+ DTDGs& $V_t$& Set of nodes in snapshot $G_t$&\\
+ DTDGs& $E_t$& Multi-set of edges in snapshot $G_t$&\\
+ DTDGs& $A^{vertex}_t$& Node attributes in snapshot $G_t$&\\
+ DTDGs& $A_t^{edge}$& Edge attributes in snapshot $G_t$&\\
+ DTDGs& $N_k(v_i, t)$& Temporal $k$-hop neighborhood of node $v_i$ at time $t$&\\
+ & & &\\
+ CTDGs& $\mathcal{G}$& Dynamic graph&\\
+ CTDGs& $t_i$& Time&\\
+ CTDGs& $\varepsilon_i \in \mathcal{G}$& Event from the continuous time dynamic graph&\\
+ CTDGs& $type_i \in \{ \mathrm{add, delete, update}\}$& Event type&\\
+ CTDGs& $G_{t_i}$& Snapshot of $\mathcal{G}$ at time $t_i$&\\
+ CTDGs& $\mathcal{G}(t_i)$& Subset of $\mathcal{G}$ consisting of all events prior to time $t_i$&\\
+ CTDGs& $N_k(v_i, t_j)$& Temporal $k$-hop-neighborhood of node $v_i$ at time $t_j$&\\
+ CTDGs& $N_k(\varepsilon_i)$& Temporal $k$-hop-neighborhood of event $\varepsilon_i$&\\
+ & & &\\
+ GNNs& $emb$& Embedding function&\\
+ & $h_v$& Embedding of node $v$&\\
+ & $Decoder$& Decoder function&\\
+ & $y$& Prediction of a \gls{gnn}&\\
+ & $h_{v_i}^l$& Representation of node $v_i$ after layer $l$ of a \gls{gnn}&\\
+ & $\sigma$& Lernable permutation invariant function&\\
+ & $\oplus$& Permutation invariant function&\\
+ & & &\\
+ TGNNs& $s_{v_i}(t)$& State vector of node $v_i$ at time $t$&\\
+ & $m_{v_i}(\varepsilon_k)$& Message for node $v_i$ produced by event $\varepsilon_k$&\\
+ & $msg_s$& Message function for the source node&\\
+ & $msg_t$& Message function for the target node&\\
+ & $msg_n$& Message function to update a node for a node-wise event&\\
+ & $state$& State update function&\\
+ & & &\\
+ Explanation& $f$& Link prediction function&\\
+ & $p$& Binary classification function&\\
+ & $\mathcal{X_{\varepsilon_i}}$& Counterfactual example for the prediction for the future link $\varepsilon_i$&\\
+ & $\Psi_{\varepsilon_i}$& Set of all counterfactual examples for the prediction for the future link $\varepsilon_i$&\\
+ & $ex$& Explainer function&\\
+ & & &\\
+ Methodology& $S_{\varepsilon_i}$& Set of all possible combinations of events that happened prior to $\varepsilon_i$&\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+ & & &\\
+    \end{tabular}
+    \caption{Overview of symbols used in this work.}
+    \label{t_Appendix_symbols}
+\end{table}
 
 
 
-\subsection{Exponential complexity for possible combinations of past events}
-\label{s_Appendix_NFactorialComplexity}
+\subsection{Jaccard Similarities between explanation approaches}
+\label{s_Appendix_JaccardSimilarities}
 
-A counterfactual example $\mathcal{X}_{\varepsilon_i}$ for the prediction of a potential future edge addition event $\varepsilon_i$ from the dynamic graph $\mathcal{G}$, could be any combination of past events $\mathcal{X}_{\varepsilon_i} \subseteq \mathcal{G}(t_i) \setminus \varepsilon_i$. For $n = |\mathcal{G}(t_i) \setminus \varepsilon_i|$ the number of combinations is:
+\begin{figure}[ht]
+    \centering
+    \include{figures/evaluation/similarity/jaccard_similarity_wiki_wrong}
+    \caption{Jaccard similarity between explanations of wrong predictions on the Wikipedia dataset.}
+\end{figure}
 
-\begin{equation}
-    \sum_{k=0}^n \binom{n}{k}
-\end{equation}
 
 
 
-N-factorial growth can be proven by induction. Let $P(n)$ be the statement:
 
-\begin{equation}
-    \sum_{k=0}^n \binom{n}{k} \geq n!, \vspace{10pt} \forall n \in \mathbb{N}_0
-\end{equation}
 
-The proof is given by induction on $n$.
+\begin{table}[ht]
+    \centering
+    \small
+    \begin{tabular}{lcccccc}
+    \hline
+         &  \multicolumn{2}{c}{UCI-Messages}&  \multicolumn{2}{c}{UCI-Forums}&  \multicolumn{2}{c}{Wikipedia}\\
+         &  Correct&  Wrong&  Correct&  Wrong&  Correct& Wrong\\
+         \hline
+         T-GNNExplainer&  $0.49$&  $0.46$&  $0.29$&  $0.32$&  $0.76$& $0.58$\\
+         \gls{greedycf}-\textit{random}&  $0.02$&  $0.04$&  $0.04$&  $0.03$&  $0.28$& $0.02$\\
+         \gls{greedycf}-\textit{temporal}&  $0.05$&  $0.03$&  $0.04$&  $0.03$&  $0.17$& $0.04$\\
+         \gls{greedycf}-\textit{spatio-temporal}&  $0.06$&  $0.03$&  $0.04$&  $0.03$&  $0.13$& $0.04$\\
+         \gls{greedycf}-\textit{1-delta}&  $0.03$&  $0.02$&  $0.03$&  $0.02$&  $0.19$& $0.02$\\
+         \gls{cftgnn}-\textit{random}&  $0.09$&  $0.04$&  $0.04$&  $0.04$&  $0.17$& $0.06$\\
+         \gls{cftgnn}-\textit{temporal}&  $0.05$&  $0.04$&  $0.07$&  $0.04$&  $0.17$& $0.05$\\
+         \gls{cftgnn}-\textit{spatio-temporal}&  $0.05$&  $0.03$&  $0.04$&  $0.04$&  $0.15$& $0.04$\\
+ \gls{cftgnn}-\textit{1-delta}& $0.05$& $0.04$& $0.07$& $0.04$& $0.15$&$0.04$\\
+ \hline
+    \end{tabular}
+    \caption{$sparsity$ values when only considering necessary explanations.}
+    \label{t_spar_nec}
+\end{table}
 
-Base case: $n = 0$
 
-\begin{center}
-    $P(0): \sum_{k=0}^0 \binom{0}{k} = \binom{0}{k} = 1 \geq 1 = 0!$
-\end{center}
-
-Induction step: Show that for every $m \geq 0$, if $P(m)$ holds true, then $P(m+1)$ also holds.
-
-\begin{center}
-    $\sum_{k=0}^{m + 1} \binom{m + 1}{k} = \sum_{k=0}^{m + 1} \frac{(m+1)!}{(m+1-k)! * k!}$
-
-    $= \sum_{k=0}^{m} \frac{(m+1)!}{(m+1-k)! * k!} + \frac{(m+1)!}{(m+1-m-1)! * (m+1)!} = \sum_{k=0}^{m} \frac{(m+1)!}{(m+1-k)! * k!} + 1$
-
-    $= \sum_{k=0}^{m} (\frac{m!}{(m-k)! * k!} * \frac{m + 1}{m + 1 - k}) + 1 \stackrel{(*)}{\geq} \sum_{k=0}^{m} \frac{m!}{(m-k)! * k!} + 1$
-
-    $= m! + \frac{m!}{(m-m + 1)! * k!}$
-\end{center}
+\begin{table}[ht]
+    \centering
+    \small
+    \begin{tabular}{lcccccc}
+    \hline
+         &  \multicolumn{2}{c}{UCI-Messages}&  \multicolumn{2}{c}{UCI-Forums}&  \multicolumn{2}{c}{Wikipedia}\\
+         &  Correct&  Wrong&  Correct&  Wrong&  Correct& Wrong\\
+         \hline
+         T-GNNExplainer&  $0.46$&  $0.36$&  $0.37$&  $0.33$&  $0.33$& $0.40$\\
+         \gls{greedycf}-\textit{random}&  $0.05$&  $0.02$&  $0.05$&  $0.02$&  $0.07$& $0.02$\\
+         \gls{greedycf}-\textit{temporal}&  $0.08$&  $0.04$&  $0.06$&  $0.03$&  $0.07$& $0.03$\\
+         \gls{greedycf}-\textit{spatio-temporal}&  $0.10$&  $0.04$&  $0.06$&  $0.04$&  $0.08$& $0.04$\\
+         \gls{greedycf}-\textit{1-delta}&  $0.08$&  $0.03$&  $0.05$&  $0.03$&  $0.07$& $0.02$\\
+         \gls{cftgnn}-\textit{random}&  $0.09$&  $0.05$&  $0.10$&  $0.06$&  $0.07$& $0.07$\\
+         \gls{cftgnn}-\textit{temporal}&  $0.08$&  $0.04$&  $0.12$&  $0.05$&  $0.07$& $0.06$\\
+         \gls{cftgnn}-\textit{spatio-temporal}&  $0.07$&  $0.04$&  $0.09$&  $0.04$&  $0.07$& $0.05$\\
+ \gls{cftgnn}-\textit{1-delta}& $0.08$& $0.05$& $0.10$& $0.05$& $0.08$&$0.06$\\
+ \hline
+    \end{tabular}
+    \caption{$sparsity$ values when only considering sufficient explanations.}
+    \label{t_spar_suf}
+\end{table}

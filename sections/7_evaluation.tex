@@ -2,21 +2,23 @@
 \label{s_Evaluation}
 % Decide whether this should be a chapter for the entire evaluation including setup and description of datasets baselines etc. or if this should focus on results and discussion only (then rename and move the rest to the methodology chapter)
 
-This chapter provides a comprehensive evaluation of \gls{cftgnn}. To assess the performance and effectiveness of \gls{cftgnn} in various scenarios, a series of experiments is conducted in different settings and on multiple datasets, comparing the proposed approach against baseline explanation methods. To set the stage, the next chapter outlines the experimental setup (Section \ref{s_Evaluation_Setup}), before the results are presented in Section \ref{s_Evaluation_Results}.
+This chapter provides a comprehensive evaluation of \gls{greedycf} and \gls{cftgnn}. To assess the performance and effectiveness of both methods in various scenarios, a series of experiments is conducted in different settings and on multiple datasets, comparing the proposed approach against baseline explanation methods. To set the stage, the next chapter outlines the experimental setup (Section \ref{s_Evaluation_Setup}), which is followed by an overview of the results of this evaluation in Section \ref{s_Evaluation_Results}.
 
 \subsection{Experimental Setup}
 \label{s_Evaluation_Setup}
 
-To ensure the replicability of the results of the evaluation, this section details the experimental setup used for evaluating \gls{cftgnn}. First, the datasets are introduced (Section \ref{s_Evaluation_Setup_Datasets}). Then, the metrics used to analyze the performance of the explainers are outlined (Section \ref{s_Evaluation_Setup_Metrics}). Section \ref{s_Evaluation_Setup_TargetModel} details the explained target model and its configuration. Next, the baselines that \gls{cftgnn} is evaluated against are presented (Section \ref{s_Evaluation_Setup_Explainers}). After a brief discussion of the physical evaluation infrastructure (Section \ref{s_Evaluation_Setup_Infrastructure}), the configuration of the evaluated explainers is laid out (Section ). Lastly, the different conducted experiments are described (Section \ref{s_Evaluation_Setup_Experiments}).
+To ensure the replicability of the results of the evaluation, this section details the experimental setup used for evaluating \gls{greedycf} and \gls{cftgnn}. First, the datasets are introduced (Section \ref{s_Evaluation_Setup_Datasets}). Then, the explained target model and its configuration are detailed in Section \ref{s_Evaluation_Setup_TargetModel}. Section \ref{s_Evaluation_Setup_Explainers} details the explainers compared in the evaluation. Subsequently, Section \ref{s_Evaluation_Setup_Metrics} outlines the metrics that are used to evaluate and compare the explanation approaches. After a brief discussion of the physical evaluation infrastructure (Section \ref{s_Evaluation_Setup_Infrastructure}), the different experimental settings are outlined in Section \ref{s_Evaluation_Setup_Experiments}.
 
 \subsubsection{Datasets}
 \label{s_Evaluation_Setup_Datasets}
 
-\gls{cftgnn} is evaluated on three different datasets. These datasets are diverse in terms of their size, their structure, and the temporal density of events, aiming to verify that the explanation approaches perform similarly on different datasets.
+The explainers are evaluated on three different datasets. These datasets are diverse in terms of their size, their structure, and the temporal density of events, aiming to verify that the explanation approaches perform similarly on different datasets.
 
-The first two datasets come from an online social network among students of the University of California at Irvine \cite{kunegis_konect_2013}. The first of these is called UCI-Messages. In this dynamic graph, nodes represent students and edges private messages between these students. No node or edge features are included in the dataset. UCI-Forums is the second dataset. The nodes in this dynamic graph represent students and forums. Each edge represents a post that a student made to a specific forum. Neither the nodes nor the edges are associated with features.
+The first two datasets come from an online social network among students of the University of California at Irvine \cite{kunegis_konect_2013}. The first of these is called UCI-Messages. In this dynamic graph, nodes represent students and edges private messages between these students. No node or edge features are included in the dataset. 
 
-The third dataset is called Wikipedia \cite{kumar_predicting_2019} and consists of events representing edits of Wikipedia pages. The edits are represented as attributed links between users and pages. Thus, the dataset is a bipartite graph. It encompasses the 1,000 most edited pages and a total of 8,227 users. The edges are associated with a feature vector that represents a conversion of the edit text into a \gls{liwc} \cite{pennebaker_linguistic_2001} feature vector. This vector encodes a quantitative analysis of the text in the page edit \cite{pennebaker_linguistic_2001}.
+UCI-Forums is the second dataset. The nodes in this bipartite dynamic graph represent students and forums. Each edge represents a post that a student made to a specific forum. Neither the nodes nor the edges are associated with features.
+
+The third dataset is called Wikipedia \cite{kumar_predicting_2019} and consists of events representing edits of Wikipedia pages. The edits are represented as attributed links between users and pages. Thus, the dataset is a bipartite graph. It encompasses the 1,000 most edited pages and a total of 8,227 users. The edges are associated with attributes that represent a conversion of the edit text into a \gls{liwc} \cite{pennebaker_linguistic_2001} feature vector. This vector encodes a quantitative analysis of the text in the page edit \cite{pennebaker_linguistic_2001}.
 
 \begin{table}[ht]
     \centering
@@ -33,14 +35,14 @@ The third dataset is called Wikipedia \cite{kumar_predicting_2019} and consists 
     \label{t_Datasets}
 \end{table}
 
-Table \ref{t_Datasets} provides an overview of these datasets. The two datasets from the UCI social network cover a longer timespan and are more sparse in the temporal dimension than the Wikipedia dataset. Another major difference is that the UCI-Messages dataset contains a relatively high number of unique edges compared to the number of total edges, in contrast to the other datasets. 
-Furthermore, the UCI dataset has proportionally fewer multi-edges compared to the Wikipedia dataset.
+Table \ref{t_Datasets} provides an overview of these datasets. The two datasets from the UCI social network cover a longer timespan and are more sparse in the temporal dimension than the Wikipedia dataset. Another major difference is that, in contrast to the other datasets, the UCI-Messages dataset contains a relatively high number of unique edges compared to the number of total edges. 
+Furthermore, the UCI-Messages and UCI-Forums datasets have proportionally fewer multi-edges compared to the Wikipedia dataset.
 
 
 \subsubsection{Target Model}
 \label{s_Evaluation_Setup_TargetModel}
 
-All experiments are conducted on the dynamic graph model \gls{tgn} \cite{rossi_temporal_2020}, which is a \textit{recent} \gls{tgnn} for \glspl{ctdg} that was introduced in Section \ref{s_Background_TGNNs}. \gls{tgn} is used as the target model since this model is popular within research \cite{souza_provably_2022} and achieves state-of-the-art performance in different tasks on dynamic graphs \cite{rossi_temporal_2020, souza_provably_2022}. To its users, the model mostly remains a black box with little transparency over what leads to a specific prediction.
+All experiments are conducted on the dynamic graph model \gls{tgn} \cite{rossi_temporal_2020}. \gls{tgn} is a \gls{tgnn} for \glspl{ctdg} that was introduced in Section \ref{s_Background_TGNNs}. \gls{tgn} is used as the target model since it is popular within research \cite{souza_provably_2022} and achieves state-of-the-art performance in different tasks on dynamic graphs \cite{rossi_temporal_2020, souza_provably_2022}. To its users, the model mostly remains a black-box with little transparency over what leads to a specific prediction.
 
 For the experiments, the \gls{tgn} model is configured with a \gls{gru} as memory updater, graph attention as an embedding module, last message aggregation, and the identity memory function. This corresponds to the \gls{tgn}-attn configuration presented as the default configuration by the authors of \gls{tgn} \cite{rossi_temporal_2020}. The batch size is set to 32 events. For training, the data is split into four temporal sections. The first $20\%$ of the data are processed but not used for training. The following $50\%$ of events are used in the training. The remaining $30\%$ are split into equal parts for validation and testing. After training for $30$ epochs with early stopping on the model accuracy, the \gls{tgn} model archives a high average precision, as shown in Table \ref{t_TGNTrainingPerformance}.
 
@@ -61,58 +63,59 @@ For the experiments, the \gls{tgn} model is configured with a \gls{gru} as memor
 
 \subsubsection{Explainers}
 \label{s_Evaluation_Setup_Explainers}
-As there are not yet any counterfactual explanation methods for dynamic graph models, \gls{cftgnn} and \gls{greedycf} are evaluated against T-GNNExplainer \cite{xia_explaining_2023} since this explainer is the only other approach that also aims to explain predictions on \glspl{ctdg}. Comparing factual and counterfactual explanation methods introduces a challenge, as these methods produce substantially different explanations \cite{tan_learning_2022}. Thus, the performance is measured both with the $fid_+$ and the $fid_-$ metric to portray necessity and sufficiency separately. For the $fid_+$ score, the explanations that T-GNNExplainer produces are interpreted as counterfactual examples.
+As there are not yet any counterfactual explanation methods for dynamic graph models, \gls{cftgnn} and \gls{greedycf} are evaluated against T-GNNExplainer \cite{xia_explaining_2023} since this explainer also aims to explain predictions on \glspl{ctdg}. TempME \cite{chen_tempme_2023}, the only other explanation method that targets \glspl{ctdg}, is not considered because, as of the moment of writing, the authors have yet to release the code for this explainer. 
 
-If not explicitly mentioned, all experiments in this evaluation are conducted with the same settings for the different explainers. These settings for the explainers are chosen in a way that aims to allow for a fair comparison between explanation methods while maintaining a reasonable runtime. Furthermore, the parameters for \gls{cftgnn} are not optimized. Tuning these parameters is left to future work.
+Comparing factual and counterfactual explanation methods is a challenge, as these methods produce substantially different explanations \cite{tan_learning_2022}. Consequently, the assessment of explanatory performance is conducted separately for necessity (see Section \ref{s_Evaluation_Results_Neccesity}) and sufficiency aspects (see Section \ref{s_Evaluation_Results_Sufficiency}), allowing for an in-depth investigation into both the factual and counterfactual dimensions of the explanations.
+
+If not explicitly mentioned, all experiments in this evaluation are conducted with the same settings for the different explainers. The settings for the explainers are chosen to allow for a fair comparison between explanation methods while maintaining a reasonable runtime. Furthermore, the parameters for \gls{cftgnn} are not yet optimized. Tuning these parameters is left to future work.
 
 The T-GNNExplainer is trained and configured as described by its authors \cite{xia_explaining_2023}. The rollout number is fixed at $500$ iterations, and the number of candidate events is limited to $30$. The original implementation is used, including all the modifications the authors made to the target model \gls{tgn} that are necessary for T-GNNExplainer to work properly.
 
-For the greedy explainer baseline, the upper limit on the candidate events $m_{max}$ is set to $64$. The sample size $l$ is configured to $10$, meaning that up to $10$ events are sampled to expand the search tree in each iteration.
+For \gls{greedycf}, the upper limit on the candidate events $m_{max}$ is set to $64$. The sample size $l$ is configured to $10$, meaning that up to $10$ events are sampled to expand the search tree in each iteration.
 
 For \gls{cftgnn}, the upper limit on the candidate events $m_{max}$ is also set to $64$. The maximum number of iterations $it_{max}$ is $300$. To balance the exploration and exploitation of the search tree, the hyperparameters $\alpha$ and $\beta$ are set to $\alpha = 2$ and $\beta = 1$.
 
-
-In the original implementation of T-GNNExplainer, which is used in this evaluation, the explainer is implemented with an approximation strategy for the results of the link prediction function. For this approximation, the past events are restricted to those events that are in a $k$-hop-neighborhood of the explained event, with $k$ set to the number of \gls{gnn} layers if the explained link prediction function is a \gls{tgnn}. Furthermore, events are submitted to the link prediction function not in batches but all together. This approximation may lead to predictions that differ substantially from the predictions without such approximation.
-
 \subsubsection{Metrics} 
 \label{s_Evaluation_Setup_Metrics}
-The choice of appropriate metrics is crucial for evaluating the effectiveness of explanation methods, as it allows for a fair and comprehensive assessment of their performance. As discussed in Sectio \ref{s_ProblemFormulation_Objectives}, the primary objectives of the explainer are maximizing discoveries and minimizing complexity. To judge how well \gls{cftgnn} achieves these objectives, appropriate metrics are required.
+The choice of appropriate metrics is crucial for evaluating the effectiveness of explanation methods, as it allows for a fair and comprehensive assessment of their performance. As discussed in Sectio \ref{s_ProblemFormulation_Objectives}, the primary objectives of the explainer are maximizing discoveries and minimizing complexity. To judge how well \gls{cftgnn} and \gls{greedycf} achieve these objectives, appropriate metrics are required.
 
-The fidelity metric has been proposed to evaluate the quality of explanations \cite{amara_graphframex_2022}. Prior research has established different definitions for the fidelity metric \cite{yuan_explainability_2020, lucic_cf-gnnexplainer_2022, xia_explaining_2023, amara_graphframex_2022, prado-romero_survey_2023}. Different formulations exist, targeting the explained phenomenon and the explained model \cite{amara_graphframex_2022}. When targeting the phenomenon, fidelity is assessed in relation to the ground-truth concerning the occurrence of the future link; conversely, when targeting the model, fidelity is measured in reference to the prediction of the link prediction function \cite{amara_graphframex_2022}. Since the aim of this thesis is to explain models, not the data, the fidelity is calculated with attention towards the model. Specifically, this work adapts the scores $fid_+$ and $fid_-$ \cite{amara_graphframex_2022, yuan_explainability_2020} to explanations on dynamic graph models.
-
-\begin{equation}
-    fid_+ = 1 - \frac{1}{N} \sum_{i = 1}^N \mathbbm{1}(p(f(\mathcal{G}(t_i)), \varepsilon_i) = p(f(\mathcal{G}(t_i) \setminus \mathcal{X}_{\varepsilon_i}, \varepsilon_i))) 
-\end{equation}
+The fidelity metric has been proposed by earlier work to evaluate how well explanation methods identify important input features \cite{yuan_explainability_2020}. Prior research has established different definitions for the fidelity metric \cite{yuan_explainability_2020, lucic_cf-gnnexplainer_2022, xia_explaining_2023, amara_graphframex_2022, prado-romero_survey_2023}. Different formulations exist, targeting the explained phenomenon and the explained model \cite{amara_graphframex_2022}. When targeting the phenomenon, fidelity is assessed in relation to the ground-truth concerning the occurrence of the future link; conversely, when targeting the model, fidelity is measured in reference to the prediction of the link prediction function \cite{amara_graphframex_2022}. Since the aim of this thesis is to explain models, not the data, the fidelity metric is calculated in regard to the model. Specifically, this work adapts the scores $fid_-$ and $fid_+$ \cite{amara_graphframex_2022, yuan_explainability_2020} to explanations on dynamic graph models:
 
 \begin{equation}
     fid_- = 1 - \frac{1}{N} \sum_{i = 1}^N \mathbbm{1}(p(f(\mathcal{G}(t_i)), \varepsilon_i) = p(f(\mathcal{X}_{\varepsilon_i}, \varepsilon_i)))
 \end{equation}
 
+\begin{equation}
+    fid_+ = 1 - \frac{1}{N} \sum_{i = 1}^N \mathbbm{1}(p(f(\mathcal{G}(t_i)), \varepsilon_i) = p(f(\mathcal{G}(t_i) \setminus \mathcal{X}_{\varepsilon_i}, \varepsilon_i))) 
+\end{equation}
+
 Here, $\varepsilon_1, ..., \varepsilon_N$ are possible future links and $\mathcal{X}_{\varepsilon_1},...,\mathcal{X}_{\varepsilon_N}$ the associated explanations for their prediction. The indicator function $\mathbbm{1}(a = b)$ returns $1$, if $a$ is equal to $b$, else it return $0$.
 
-The $fid_-$ score measures how well the explanation captures the relevant past events that lead the dynamic graph model to its prediction. Thus, it measures the sufficiency of the explanations and is most useful for judging the quality of factual explanations \cite{amara_graphframex_2022}. More relevant to counterfactual explanations is the $fid_+$ score, which measures whether the prediction changes when the explanation is removed from the set of past events. Hence, it provides insights into the necessity of the explanations \cite{amara_graphframex_2022}. Recalling the definition of a counterfactual example from Section \ref{s_ProblemFormulation_CFExamples}, the $fid_-$ score represents the proportion of cases in which the explainer manages to find a counterfactual example, directly accounting for the objective of maximizing discoveries. Both types of fidelity scores take on values between $0$ and $1$, with higher values being preferable over lower ones.
+The $fid_-$ score measures how well the explanation captures the relevant past events that lead the dynamic graph model to its prediction. Thus, it measures the sufficiency of the explanations and is most useful for judging the quality of factual explanations \cite{amara_graphframex_2022}. The $fid_-$ score can be interpreted as the fraction of explanations that are sufficient on their own to produce the original prediction. More relevant to counterfactual explanations is the $fid_+$ score, which measures whether the prediction changes when the explanation is removed from the set of past events. Hence, it provides insights into the necessity of the explanations \cite{amara_graphframex_2022, tan_learning_2022}. Recalling the definition of a counterfactual example from Section \ref{s_ProblemFormulation_CFExamples}, the $fid_+$ score represents the proportion of cases in which the explainer manages to find a necessary explanation in the form of a counterfactual example. Therefore, the $fid_+$ metric provides a measure for the objective of maximizing discoveries. Both types of fidelity scores take on values between $0$ and $1$, with higher values being preferable over lower ones.
 
-To bring the $fid_+$ and the $fid_-$ score into a single score that characterizes both sufficiency and necessity requirements, the characterization score proposed by \cite{amara_graphframex_2022} is adopted. It is defined as the weighted harmonic mean of the two fidelity scores:
+To bring the $fid_+$ and the $fid_-$ score into a single score that characterizes both sufficiency and necessity requirements, the characterization score $char$ proposed by Amara et al. \cite{amara_graphframex_2022} is adopted. It is defined as the weighted harmonic mean of the two fidelity scores:
 
 \begin{equation}
     char = \frac{w_+ + w_-}{\frac{w_+}{fid_+} + \frac{w_-}{fid_-}}
 \end{equation}
 
-Where $w_+$ and $w_-$ are weights for $fid_+$ and $fid_-$ that allow putting more attention on either sufficiency or necessity. To make a fair comparison between the counterfactual explainers proposed in this thesis and the factual baseline explainer, the weights are set to $w_+ = w_- = 0.5$.
+Where $w_+$ and $w_-$ are weights for $fid_+$ and $fid_-$ that allow putting more attention on either sufficiency or necessity. To make a fair comparison between the counterfactual explainers proposed in this thesis and the factual baseline explainer, the weights are set to $w_+ = w_- = 0.5$. The characterization score $char$ takes on values between $0$ and $1$, where larger values indicate better performance.
 
-Addressing the second objective of minimizing complexity, the sparsity metric is a widely used tool to gauge the complexity of explanations \cite{yuan_explainability_2020, amara_graphframex_2022, prado-romero_survey_2023}. It measures the ratio between the past events in the explanation $\mathcal{X}_{\varepsilon_i}$ and all past events considered as candidates for the explanation $C(\mathcal{G}, \varepsilon_i, k, m_{max})$.
+The sparsity metric $sparsity$ is a widely used tool to gauge the complexity of explanations \cite{yuan_explainability_2020, amara_graphframex_2022, prado-romero_survey_2023}, which addresses the second objective of minimizing complexity.
 
 \begin{equation}
     sparsity = \frac{1}{N} \sum_{i = 1}^N \frac{|\mathcal{X}_{\varepsilon_i}|}{|C(\mathcal{G}, \varepsilon_i, k, m_{max})|}
 \end{equation}
 
-The Jaccard similarity \cite{jaccard_distribution_1912} $J(\mathcal{X}_i, \mathcal{X}_j)$ is employed to analyze the similarity between the explanations produced by different explanation methods. The Jaccard similarity of two explanations $\mathcal{X}_i$ and $\mathcal{X}_j$ is defined as:
+The sparsity metric measures the ratio between the past events in the explanation $\mathcal{X}_{\varepsilon_i}$ and all past events considered as candidates for the explanation $C(\mathcal{G}, \varepsilon_i, k, m_{max})$. It takes on values between $0$ and $1$, with lower values being considered better than higher values.
+
+Finally, the Jaccard similarity \cite{jaccard_distribution_1912} $J(\mathcal{X}_i, \mathcal{X}_j)$ is employed to analyze the similarity between the explanations produced by different explanation methods. The Jaccard similarity of two explanations $\mathcal{X}_i$ and $\mathcal{X}_j$ is defined as:
 
 \begin{equation}
     J(\mathcal{X}_i, \mathcal{X}_j) = \frac{|\mathcal{X}_i \cap \mathcal{X}_j|}{|\mathcal{X}_i \cup \mathcal{X}_j|}
 \end{equation}
 
-The Jaccard similarity measures the similarity between two explanations by comparing the intersection of the explanations, which comprises the events included in both explanations, with the union of the explanations, meaning the events that are present in either one or both explanations.
+The Jaccard similarity measures the similarity between two explanations by comparing the intersection of the explanations with the union of the explanations. The intersection of the explanation $\mathcal{X}_i \cap \mathcal{X}_j$ comprises the events included in both explanations, whereas the union $\mathcal{X}_i \cup \mathcal{X}_j$ includes the events that are present in either one or both explanations.
 
 % Oracle calls?
 
@@ -124,21 +127,18 @@ The Jaccard similarity measures the similarity between two explanations by compa
 
 \subsubsection{Infrastructure}
 \label{s_Evaluation_Setup_Infrastructure}
-Experiments were conducted on a high-performance computing cluster with specific hardware configurations tailored to the datasets used. For the UCI-Forums and UCI-Messages datasets, each experiment was run on a machine with an Intel Xeon Gold 6230 CPU, 16GB of RAM storage, and an NVIDIA Tesla V100 SXM2 GPU with 32GB of VRAM. Similarly, for the Wikipedia dataset, each experiment was conducted on a machine with an Intel Xeon Platinum 8358 CPU, 16GB of RAM storage, and an NVIDIA Tesla A100 GPU with 80GB of VRAM.
-
-This infrastructure setup ensures efficient resource utilization and experiments with replicable results.
+The experiments are conducted on a high-performance computing cluster with specific hardware configurations tailored to the datasets used. For the UCI-Forums and UCI-Messages datasets, each experiment is run on a machine with an Intel Xeon Gold 6230 CPU, 16GB of RAM storage, and an NVIDIA Tesla V100 SXM2 GPU with 32GB of VRAM. Similarly, for the Wikipedia dataset, each experiment is conducted on a machine with an Intel Xeon Platinum 8358 CPU, 16GB of RAM storage, and an NVIDIA Tesla A100 GPU with 80GB of VRAM.
 
 \subsubsection{Experiments}
 \label{s_Evaluation_Setup_Experiments}
 
-Experiments are conducted for the explanation of predictions on the UCI and Wikipedia datasets. As pointed out by \cite{amara_graphframex_2022}, evaluating explanation methods on a set of mostly correct predictions introduces a bias in the evaluation. Thus, the explanation approaches are evaluated on wrong and correct predictions separately. Each experiment consists of explaining $200$ predictions using one of the explanation methods. The explained predictions are the same across the evaluated explanation approaches. Both the greedy baseline and \gls{cftgnn} are evaluated with the selection strategies \textit{random}, \textit{recent}, \textit{closest}, and \textit{1-delta} (see Section \ref{s_Methodology_SelectionStrategies}) separately. When talking about the results for one of the explanation methods achieved in combination with a selection strategy, the combination is referred to as "Explainer-Selection-Strategy", for example \gls{cftgnn}-\textit{recent} for the \gls{cftgnn} explainer paired with the \textit{recent} selection strategy
+Experiments are conducted for the explanation of predictions on the UCI and Wikipedia datasets. Evaluating explanation methods on a set of mostly correct predictions introduces a bias in the evaluation \cite{amara_graphframex_2022}. Thus, the explanation approaches are evaluated on wrong and correct predictions separately. Each experiment consists of explaining $200$ predictions using one of the explanation methods. The explained predictions are the same across the evaluated explanation approaches. Both \gls{greedycf} and \gls{cftgnn} are evaluated with the selection strategies \textit{random}, \textit{temporal}, \textit{spatio-temporal}, and \textit{1-delta} (see Section \ref{s_Methodology_SelectionStrategies}) separately. When discussing the results for one of the explanation methods achieved in combination with a selection strategy, the combination is referred to as "Explainer-\textit{Selection-Strategy}", for example, \gls{cftgnn}-\textit{temporal} for the \gls{cftgnn} explainer paired with the \textit{temporal} selection strategy.
 
 \FloatBarrier
 \subsection{Results}
 \label{s_Evaluation_Results}
 
-In this section, the results of the experiments are presented and discussed. First, the results regarding the explanatory performance of the explanation methods are covered in Section \ref{s_Evaluation_Results_Performance}. The focus of this section is on establishing how well the explanation approaches perform in terms of the primary objectives set in the problem formulation (see Section \ref{s_ProblemFormulation_Objectives}). After that, Section \ref{s_Evaluation_Results_Runtime} compares the explanation approaches in terms of how long it takes them to provide an explanation. 
-
+This section presents and discusses the results of the evaluation. To take a look at the explanatory capabilities of the compared explainers, the produced explanations are first evaluated in terms of necessity (Section \ref{s_Evaluation_Results_Neccesity}), then in terms of their sufficiency (Section \ref{s_Evaluation_Results_Sufficiency}), before taking a convergent perspective onto both the necessity and sufficiency of the explanations (Section \ref{s_Evaluation_Results_ConvergentAnalysis}). After the analysis of the explanatory performance, other aspects of the explanation approaches are compared. Section \ref{s_Evaluation_Results_Runtime} takes a look at the runtime of the approaches. In Section \ref{s_Evaluation_Results_Iterations}, the influence of search iterations on the performance of \gls{cftgnn} is evaluated in detail. Next, Section \ref{s_Evaluation_Results_Similarities} presents and discusses the degree of similarity among the explanations produced by the evaluated explainers. Finally, Section \ref{s_Evaluation_Results_SelectionStrategies} studies the effects of the selection strategy on the \gls{greedycf} and \gls{cftgnn} approaches.
 
 
  
@@ -146,13 +146,13 @@ In this section, the results of the experiments are presented and discussed. Fir
 \subsubsection{Neccesity of Explanations}
 \label{s_Evaluation_Results_Neccesity}
 
-Counterfactual examples include information necessary for the original prediction of the target model. As previously discussed, the $fid_+$ score provides a good measure of how well an explainer maximizes discovering counterfactual explanations, which thus captures the necessity. Table \ref{t_fid_plus} provides an overview of all the evaluated explanation approaches. The \gls{cftgnn} approach with the \textit{1-delta} selection strategy clearly outperforms the other approaches in all but one scenarios. The \textit{recent} selection strategy is the second-best selection strategy for \glspl{cftgnn}. For the \gls{greedycf} approach, the \textit{recent} selection strategy performs best in all but one settings. Here the \textit{1-delta} selection strategy is second-best. Across \gls{cftgnn} and \gls{greedycf} the \textit{closest} selection strategy performs worst.
+Counterfactual examples include information necessary for the original prediction of the target model. As previously discussed, the $fid_+$ score provides a measure for the degree to which an explainer discovers counterfactual explanations, which captures the necessity. Table \ref{t_fid_plus} provides an overview of the $fid_+$ scores of all the evaluated explanation approaches. In all but one scenario, the \gls{cftgnn} approach with either the \textit{spatio-temporal} or the \textit{1-delta} selection strategies performs best. There exists a pattern that \gls{cftgnn}-\textit{spatio-temporal} performs better than \gls{cftgnn}-\textit{1-delta} when explaining correct predictions on any dataset, while \gls{cftgnn}-\textit{1-delta} outperforms \gls{cftgnn}-\textit{spatio-temporal} whenever the focus is on wrong predictions. \gls{greedycf}-\textit{spatio-temporal} performs best for correct predictions on the UCI-Messages and the UCI-Forums datasets. The \textit{random} selection strategy is outperformed by the other selection strategies for both \gls{greedycf} and \gls{cftgnn} across all datasets, with the exception of \gls{cftgnn}-\textit{temporal}, which performs slightly worse than \gls{cftgnn}-\textit{random} for correct predictions on the Wikipedia dataset. This suggests that the selection strategies \textit{temporal}, \textit{spatio-temporal}, and \textit{1-delta} aid \gls{greedycf} and \gls{cftgnn} in finding necessary explanations. The advantage in terms of $fid_+$ scores achieved by these selection strategies over the \textit{random} selection strategy is particularly pronounced for \gls{greedycf}.
 
 
 %\subsubsection{Explanation Performance}
 %\label{s_Evaluation_Results_Performance}
 
-%This section covers the performance of the evaluated explanation methods for the objectives of maximizing discoveries and minimizing complexity. The main aim of the proposed explanation methods is to provide counterfactual explanations. To generate counterfactual examples with the T-GNNExplainer approach, the subgraph it generates is removed and interpreted as a counterfactual example. As discussed before, the $fid_+$ score provides a good measure of how well an explainer maximizes discovering counterfactual explanations. Table \ref{t_fid_plus} provides an overview of all the evaluated explanation approaches. The \gls{cftgnn} approach with the \textit{1-delta} selection strategy clearly outperforms the other approaches in all but one scenarios. The \textit{recent} selection strategy is the second-best selection strategy for \glspl{cftgnn}. For the \gls{greedycf} approach, the \textit{recent} selection strategy performs best in all but one settings. Here the \textit{1-delta} selection strategy is second-best. Across \gls{cftgnn} and \gls{greedycf} the \textit{closest} selection strategy performs worst.
+%This section covers the performance of the evaluated explanation methods for the objectives of maximizing discoveries and minimizing complexity. The main aim of the proposed explanation methods is to provide counterfactual explanations. To generate counterfactual examples with the T-GNNExplainer approach, the subgraph it generates is removed and interpreted as a counterfactual example. As discussed before, the $fid_+$ score provides a good measure of how well an explainer maximizes discovering counterfactual explanations. Table \ref{t_fid_plus} provides an overview of all the evaluated explanation approaches. The \gls{cftgnn} approach with the \textit{1-delta} selection strategy clearly outperforms the other approaches in all but one scenarios. The \textit{temporal} selection strategy is the second-best selection strategy for \glspl{cftgnn}. For the \gls{greedycf} approach, the \textit{temporal} selection strategy performs best in all but one settings. Here the \textit{1-delta} selection strategy is second-best. Across \gls{cftgnn} and \gls{greedycf} the \textit{spatio-temporal} selection strategy performs worst.
 
 \begin{table}
     \centering
@@ -162,42 +162,23 @@ Counterfactual examples include information necessary for the original predictio
          &  \multicolumn{2}{c}{UCI-Messages}&  \multicolumn{2}{c}{UCI-Forums}&  \multicolumn{2}{c}{Wikipedia}\\
          &  Correct&  Wrong&  Correct&  Wrong&  Correct& Wrong\\
          \hline
-         T-GNNExplainer&  $0.10$&  $0.25$&  0.05&  0.28&  0.05& 0.22\\
-         \gls{greedycf}-\textit{random}&  $0.02$&  $0.08$&  0.05&  0.07&  0.05& 0.11\\
-         \gls{greedycf}-\textit{closest}&  $0.00$&  $0.03$&  0.01&  0.02&  0.03& 0.07\\
-         \gls{greedycf}-\textit{recent}&  \underline{$0.14$}&  $0.33$&  \textbf{0.43}&  0.31&  0.1& 0.3\\
-         \gls{greedycf}-\textit{1-delta}&  $0.11$&  $0.35$&  0.29&  0.27&  0.08& 0.28\\
-         \gls{cftgnn}-\textit{random}&  $0.11$&  $0.36$&  0.32&  0.31&  \underline{0.14}& 0.43\\
-         \gls{cftgnn}-\textit{closest}&  $0.09$&  $0.25$&  0.22&  0.26&  0.09& 0.33\\
-         \gls{cftgnn}-\textit{recent}&  \underline{$0.14$}&  \underline{$0.39$}&  0.39&  \underline{$0.38$}&  0.13& \underline{$0.48$}\\
- \gls{cftgnn}-\textit{1-delta}& $\textbf{0.17}$& $\textbf{0.42}$& \underline{$0.4$}& $\textbf{0.41}$& $\textbf{0.16}$&$\textbf{0.54}$\\
+         T-GNNExplainer&  $0.10$&  $0.25$&  $0.05$&  $0.28$&  $0.05$& $0.22$\\
+         \gls{greedycf}-\textit{random}&  $0.02$&  $0.08$&  $0.05$&  $0.07$&  $0.05$& $0.11$\\
+         \gls{greedycf}-\textit{temporal}&  $0.14$&  $0.33$&  $0.43$&  $0.31$&  $0.10$& $0.30$\\
+         \gls{greedycf}-\textit{spatio-temporal}&  $\textbf{0.20}$&  $0.38$&  $\textbf{0.46}$&  $0.30$&  $0.14$& $0.39$\\
+         \gls{greedycf}-\textit{1-delta}&  $0.11$&  $0.35$&  $0.29$&  $0.27$&  $0.08$& $0.28$\\
+         \gls{cftgnn}-\textit{random}&  $0.11$&  $0.36$&  $0.32$&  $0.31$&  $0.14$& $0.43$\\
+         \gls{cftgnn}-\textit{temporal}&  $0.14$&  $0.39$&  $0.39$&  \underline{$0.38$}&  $0.13$& $0.48$\\
+         \gls{cftgnn}-\textit{spatio-temporal}&  $\textbf{0.20}$&  \underline{$0.41$}&  \underline{$0.44$}&  $0.36$&  $\textbf{0.18}$& \underline{$0.53$}\\
+ \gls{cftgnn}-\textit{1-delta}& $0.17$& $\textbf{0.42}$& $0.40$& $\textbf{0.41}$& \underline{$0.16$}&$\textbf{0.54}$\\
  \hline
     \end{tabular}
-    \caption{$fid_+$ scores of the different explanation methods for explaining wrong and correct predictions. The best result is \textbf{bold}, and the second best is \underline{underlined}.}
+    \caption{$fid_+$ scores of the different explanation methods for explaining wrong and correct predictions. The best result is \textbf{bold}, and the second best is \underline{underlined}. If multiple explainers have the best score, they all are \textbf{bold}.}
     \label{t_fid_plus}
 \end{table}
 
 
-Looking at the $fid_+$ metric in isolation ignores the objective of minimizing complexity. Thus, Figure \ref{f_fid_spar} shows what $fid_+$ scores the explanation approaches achieve at different sparsity levels. The plots report the cumulative distribution of the counterfactual explanations, where higher $fid_+$ values are considered better, while a low $sparsity$ is preferable. Across all datasets and settings, the T-GNNExplainer approach consistently performs worse than \gls{cftgnn} with the \textit{1-delta}, \textit{recent}, and \textit{random} selection strategies. This is evident because the $fid_+$ level of the T-GNNExplainer approach is consistently below that of \gls{cftgnn} with these selection strategies. Similarly, \gls{greedycf}-\textit{recent} outperforms T-GNNExplainer.
-
-Having a look at the differences between explaining correct predictions and explaining wrong predictions, the results for the UCI-Messages and the Wikipedia datasets differ substantially. For both datasets, wrong predictions can be explained with a counterfactual example in more than double the cases. The reasons for this phenomenon may lie in what essentially differentiates correct from wrong predictions: For wrong predictions, the past information was misinterpreted by the link prediction function. For correct predictions, the past information was correctly interpreted. Thus, explaining wrong predictions with counterfactuals entails finding the past information that mislead the link prediction function. In contrast, finding a counterfactual example for a correct prediction requires removing information so that the prediction becomes incorrect, which could be challenging if all past information is very much in line with the prediction. In contrast, finding misleading information could be an easier task. Regardless of the reasons for this difference in $fid_+$ levels, explaining wrong predictions is argued to be more informative than explaining correct predictions because explanations for correct predictions explain both the phenomenon and the model, whereas wrong predictions solely explain the model \cite{amara_graphframex_2022}.
-
-\begin{figure}[ht]
-    \centering
-    \include{figures/evaluation/fid_spar}
-    \caption{$fid_+$-$sparsity$ curves on the datasets for the different explanation methods.}
-    \label{f_fid_spar}
-\end{figure}
-
-While \gls{cftgnn}-\textit{1-delta} performs best in most of the settings, for correct predictions on the UCI-Forums dataset, it is outperformed by \gls{greedycf}-\textit{recent}. The reasons for this are unclear. It could be a statistical anomaly that appears on the specific sample that was drawn for the experiment. Section \ref{s_Evaluation_Results_Iterations} shows that \gls{cftgnn} can outperform \gls{greedycf}-\textit{recent} for this setting when the number of iterations is increased.
-
-
-\FloatBarrier
-
-\subsubsection{Sufficiency of Explanations}
-\label{s_Evaluation_Results_Sufficiency}
-
- While the aim of the proposed explanation methods is to produce counterfactual explanations, which do not explicitly aim to achieve sufficiency, this section assesses how the different approaches perform in terms of sufficiency. As discussed before, the $fid_-$ metric is used to analyze the sufficiency achieved by the explainers. For this metric, the explanations are interpreted as factual rather than counterfactual explanations. Table \ref{t_fid_minus} shows how the different approaches perform in this metric. Since T-GNNExplainer is developed to provide factual explanations, it would be of no surprise if it outperformed the other methods in terms of $fid_-$. While this is the case for correct predictions on the UCI-Messages, and the Wikipedia datasets, there are different explainers that perform best in the other settings. A potential explanation for this may lie in the implementation of T-GNNExplainer. For the evaluation, the original implementation was used, which uses an approximation strategy for the results of the link prediction function. For this approximation, the past events are restricted to those events that are in a $k$-hop-neighborhood of the explained event, with $k$ set to the number of \gls{gnn} layers if the explained link prediction function is a \gls{tgnn}. Furthermore, events are submitted to the link prediction function not in batches but all together. This approximation may lead to predictions that differ substantially from the predictions without such approximation. This may partly explain why the $fid_-$ score is rather low across the experiments.
+Looking at the $fid_+$ metric in isolation ignores the objective of minimizing complexity. Thus, the sparsity of the explanations is considered as well. Table \ref{t_spar_nec} shows the sparsity over the explanations that are necessary to the explained predictions. Looking at the explanations that are necessary on their own allows for a separate analysis of the necessary explanations. The table shows that both \gls{greedycf} and \gls{cftgnn} produce substantially more concise necessary explanations than T-GNNExplainer. However, looking at these sparsity values without any reference to the $fid_+$ metric can be misleading. For instance, \gls{greedycf}-\textit{random} achieves very low $sparsity$ scores in many settings, however, it only also achieves a substantially lower $fid_+$ score than the other \gls{greedycf} variants. To allow for a more nuanced assessment, Figure \ref{f_fid_spar} shows what $fid_+$ scores the explanation approaches achieve at different sparsity levels. The plots report the cumulative distribution of necessary explanations, e.g., counterfactual examples, over different $sparsity$ levels. Higher $fid_+$ values are considered better, while a low $sparsity$ is preferable. Across all datasets and settings, the T-GNNExplainer approach consistently performs worse than all combinations of \gls{cftgnn} and any selection strategy. This is evident because the $fid_+$ level of the T-GNNExplainer approach is below that of \gls{cftgnn} from low sparsity values to high sparsity values. Similarly, \gls{greedycf} with all but the \textit{random} selection strategy outperforms T-GNNExplainer in most cases, with the exception of the experiment for wrong predictions on the UCI-Forums dataset, where T-GNNExplainer slightly outperforms \gls{greedycf}-\textit{1-delta} for very high sparsity values.
 
 \begin{table}[ht]
     \centering
@@ -207,28 +188,76 @@ While \gls{cftgnn}-\textit{1-delta} performs best in most of the settings, for c
          &  \multicolumn{2}{c}{UCI-Messages}&  \multicolumn{2}{c}{UCI-Forums}&  \multicolumn{2}{c}{Wikipedia}\\
          &  Correct&  Wrong&  Correct&  Wrong&  Correct& Wrong\\
          \hline
-         T-GNNExplainer&  $\textbf{0.82}$&  $0.83$&  0.57&  0.72&  \textbf{0.90}& 0.69\\
-         \gls{greedycf}-\textit{random}&  $0.34$&  $0.97$&  0.28&  \textbf{0.99}&  0.57& \textbf{0.93}\\
-         \gls{greedycf}-\textit{closest}&  $0.11$&  $0.98$&  0.01&  \textbf{0.99}&  0.31& \textbf{0.93}\\
-         \gls{greedycf}-\textit{recent}&  $0.56$&  $\textbf{0.98}$&  0.61&  0.98&  0.77& 0.90\\
-         \gls{greedycf}-\textit{1-delta}&  $0.67$&  $\textbf{0.98}$&  0.64&  \textbf{0.99}&  0.72& 0.90\\
-         \gls{cftgnn}-\textit{random}&  $0.68$&  $0.95$&  0.66&  0.97&  \underline{0.88}& 0.88\\
-         \gls{cftgnn}-\textit{closest}&  $0.65$&  $0.96$&  0.63&  0.97&  0.84& 0.87\\
-         \gls{cftgnn}-\textit{recent}&  $0.69$&  $0.96$&  \underline{0.66}&  0.98&  \underline{0.88}& 0.88\\
- \gls{cftgnn}-\textit{1-delta}& \underline{$0.70$}& $0.96$& \textbf{0.68}& 0.95& \underline{0.88}&0.90\\
+         T-GNNExplainer&  $0.43$&  $0.35$&  $0.29$&  $0.35$&  $0.33$& $0.43$\\
+         \gls{greedycf}-\textit{random}&  $0.03$&  $0.02$&  $0.02$&  $0.02$&  $0.04$& $0.02$\\
+         \gls{greedycf}-\textit{temporal}&  $0.05$&  $0.04$&  $0.05$&  $0.03$&  $0.06$& $0.03$\\
+         \gls{greedycf}-\textit{spatio-temporal}&  $0.08$&  $0.04$&  $0.05$&  $0.04$&  $0.07$& $0.04$\\
+         \gls{greedycf}-\textit{1-delta}&  $0.06$&  $0.03$&  $0.04$&  $0.03$&  $0.05$& $0.02$\\
+         \gls{cftgnn}-\textit{random}&  $0.08$&  $0.05$&  $0.09$&  $0.06$&  $0.07$& $0.07$\\
+         \gls{cftgnn}-\textit{temporal}&  $0.07$&  $0.04$&  $0.10$&  $0.05$&  $0.06$& $0.06$\\
+         \gls{cftgnn}-\textit{spatio-temporal}&  $0.06$&  $0.04$&  $0.08$&  $0.04$&  $0.07$& $0.05$\\
+ \gls{cftgnn}-\textit{1-delta}& $0.07$& $0.05$& $0.09$& $0.06$& $0.07$&$0.06$\\
  \hline
     \end{tabular}
-    \caption{$fid_-$ scores of the different explanation methods for explaining wrong and correct predictions. The best result is \textbf{bold}, and the second best is \underline{underlined}.}
+    \caption{$sparsity$ values when only considering necessary explanations.}
+    \label{t_spar}
+\end{table}
+
+There is a substantial difference between the explanations for correct predictions and those for wrong predictions for the UCI-Messages and the Wikipedia datasets.
+%Having a look at the differences between explaining correct predictions and explaining wrong predictions, the results for the UCI-Messages and the Wikipedia datasets differ substantially. 
+For wrong predictions, necessary explanations are found in more than double the cases than for correct predictions in both datasets. The reasons for this phenomenon may lie in what essentially differentiates correct from wrong predictions: For wrong predictions, the past information was misinterpreted by the link prediction function. For correct predictions, the past information was correctly interpreted. Thus, explaining wrong predictions with counterfactuals entails finding the past information that mislead the link prediction function. In contrast, finding a counterfactual example for a correct prediction requires removing information so that the prediction becomes incorrect, which could be challenging if nearly all past information is in line with the prediction. In contrast, finding misleading information could be an easier task. Regardless of the reasons for this difference in $fid_+$ levels, explaining wrong predictions is argued to be more informative than explaining correct predictions because explanations for correct predictions can be biased, as the explanations explain not only the model but also the phenomenon \cite{amara_graphframex_2022}. In contrast, wrong predictions solely explain the model \cite{amara_graphframex_2022}.
+
+\begin{figure}[ht]
+    \centering
+    \include{figures/evaluation/fid_spar}
+    \caption{$fid_+$-$sparsity$ curves on the datasets for the different explanation methods.}
+    \label{f_fid_spar}
+\end{figure}
+
+While \gls{cftgnn} with either the \textit{1-delta} or the \textit{spatio-temporal} selection strategy performs best in most of the settings, for correct predictions on the UCI-Forums dataset, it is outperformed by \gls{greedycf}-\textit{spatio-temporal}. The reasons for this are unclear. It could be a statistical anomaly that appears on the specific sample that was drawn for the experiment. Section \ref{s_Evaluation_Results_Iterations} shows that \gls{cftgnn} can outperform \gls{greedycf}-\textit{spatio-temporal} for this setting when the number of iterations is increased.
+
+
+\FloatBarrier
+
+\subsubsection{Sufficiency of Explanations}
+\label{s_Evaluation_Results_Sufficiency}
+
+ While the aim of the proposed explanation methods is to produce counterfactual explanations, which do not explicitly aim to achieve sufficiency, this section assesses how the different approaches perform in terms of sufficiency. As discussed before, the $fid_-$ metric is used to analyze the fraction of explanations that achieve sufficiency. For this metric, the explanations are interpreted as factual rather than counterfactual explanations. Table \ref{t_fid_minus} shows how the different approaches perform in this metric. Since T-GNNExplainer is developed to provide factual explanations, it would be of no surprise if it outperformed the other methods in terms of $fid_-$. While this is the case for correct predictions on the UCI-Messages dataset, there are other explainers that perform best in the remaining settings. A potential explanation for this may lie in the implementation of T-GNNExplainer. For the evaluation, the original implementation of T-GNNExplainers was used, as proposed by its authors \cite{xia_explaining_2023}. This implementation uses an approximation strategy for the results of the link prediction function. For this approximation, the past events are restricted to those events that are in a $k$-hop-neighborhood of the explained event, with $k$ set to the number of \gls{gnn} layers if the explained link prediction function is a \gls{tgnn}. This means that all events outside this neighborhood have no influence on the model output. Furthermore, events are submitted to the link prediction function at once. However, the targeted \gls{tgn} model is trained and usually used in a batch setting \cite{rossi_temporal_2020}. This may introduce further errors in the approximation. Overall, the approximation may lead to predictions that differ substantially from the predictions without such approximation. This may partly explain why the $fid_-$ score is rather low across the experiments.
+
+\begin{table}[ht]
+    \centering
+    \small
+    \begin{tabular}{lcccccc}
+    \hline
+         &  \multicolumn{2}{c}{UCI-Messages}&  \multicolumn{2}{c}{UCI-Forums}&  \multicolumn{2}{c}{Wikipedia}\\
+         &  Correct&  Wrong&  Correct&  Wrong&  Correct& Wrong\\
+         \hline
+         T-GNNExplainer&  $\textbf{0.82}$&  $0.83$&  $0.57$&  $0.72$&  \underline{$0.90$}& $0.69$\\
+         \gls{greedycf}-\textit{random}&  $0.34$&  $0.97$&  $0.28$&  $\textbf{0.99}$&  $0.57$& $\textbf{0.93}$\\
+         \gls{greedycf}-\textit{temporal}&  $0.56$&  $\textbf{0.98}$&  $0.61$&  $0.98$&  $0.77$& $0.90$\\
+         \gls{greedycf}-\textit{spatio-temporal}&  $0.70$&  $0.96$&  $0.64$&  $0.95$&  $0.82$& $0.88$\\
+         \gls{greedycf}-\textit{1-delta}&  $0.67$&  $\textbf{0.98}$&  $0.64$&  $\textbf{0.99}$&  $0.72$& $0.90$\\
+         \gls{cftgnn}-\textit{random}&  $0.68$&  $0.95$&  $0.66$&  $0.97$&  $0.88$& $0.88$\\
+         \gls{cftgnn}-\textit{temporal}&  $0.69$&  $0.96$&  $0.66$&  $0.98$&  $0.88$& $0.88$\\
+         \gls{cftgnn}-\textit{spatio-temporal}&  \underline{$0.72$}&  $0.95$&  $\textbf{0.69}$&  $0.93$&  $\textbf{0.91}$& $0.86$\\
+ \gls{cftgnn}-\textit{1-delta}& $0.70$& $0.96$& \underline{$0.68$}& $0.95$& $0.88$&\underline{$0.90$}\\
+ \hline
+    \end{tabular}
+    \caption{$fid_-$ scores of the different explanation methods for explaining wrong and correct predictions. The best result is \textbf{bold}, and the second best is \underline{underlined}. If multiple explainers have the best score, they all are \textbf{bold}.}
     \label{t_fid_minus}
 \end{table}
 
-Interestingly, there is an apparent difference between correct and wrong predictions for the performance of \gls{cftgnn} and \gls{greedycf}. The pairings of \gls{cftgnn} with the different selection strategies outperform their respective \gls{greedycf} counterparts by between $11\%$ and $2390\%$ for correct predictions. However, the \gls{greedycf} approaches outperform the respective configurations of \gls{cftgnn} by between $1.4\%$ to $3.7\%$.
+Interestingly, there is an apparent difference between correct and wrong predictions for the performance of \gls{cftgnn} and \gls{greedycf}. The pairings of \gls{cftgnn} with the different selection strategies outperform their respective \gls{greedycf} counterparts by between $3.5\%$ and $57.6\%$ for correct predictions. However, the \gls{greedycf} approaches outperform the respective configurations of \gls{cftgnn} by up to $5.4\%$ for wrong predictions. Generally, the $fid_-$ scores achieved by \gls{cftgnn} and \gls{greedycf} for wrong predictions are very high, reaching levels of more than $0.85$ across the datasets and explainer variants. This underlines the proficiency of these explanation methods in explaining wrong predictions and suggests that counterfactual explanations are associated with a high sufficiency for wrong predictions.
+%Interestingly, there is an apparent difference between correct and wrong predictions for the performance of \gls{cftgnn} and \gls{greedycf}. The pairings of \gls{cftgnn} with the different selection strategies outperform their respective \gls{greedycf} counterparts by between $3.5\%$ and $57.6\%$ for correct predictions. However, the \gls{greedycf} approaches outperform the respective configurations of \gls{cftgnn} by up to $5.4\%$.
+%Interestingly, there is an apparent difference between correct and wrong predictions for the performance of \gls{cftgnn} and \gls{greedycf}. The pairings of \gls{cftgnn} with the different selection strategies outperform their respective \gls{greedycf} counterparts by between $3.5\%$ and $57.6\%$ for correct predictions. However, the \gls{greedycf} approaches outperform the respective configurations of \gls{cftgnn} by up to $5.4\%$.
+
+
 
 \FloatBarrier
 \subsubsection{Convergent Analysis of Sufficiency and Necessity}
 \label{s_Evaluation_Results_ConvergentAnalysis}
 
-The characterization score $char$ integrates the perspectives of sufficiency and necessity. Table \ref{t_char} shows the performance of the explainers along this metric. It shows that \gls{cftgnn}-\textit{1-delta} outperforms all other approaches, while \gls{cftgnn}-\textit{recent} represents the second-best explainer for most of the settings. This convergent perspective is also portrayed in Figure \ref{f_fid_plus_minus}, which shows the performance of the explainers in both the $fid_+$ and the $fid_-$ scores. The plots show that \gls{cftgnn} can provide the best explanations in terms of necessity while also providing comparably good performance in terms of sufficiency. 
+The characterization score $char$ integrates the perspectives of sufficiency and necessity. Table \ref{t_char} shows the performance of the explainers along this metric. While \gls{cftgnn}-\textit{1-delta} performs best in explaining wrong predictions, \gls{cftgnn}-\textit{spatio-temporal} performs best in explaining correct predictions. This convergent perspective is also portrayed in Figure \ref{f_fid_plus_minus}, which shows the performance of the explainers in both the $fid_+$ and the $fid_-$ scores. The plots show that \gls{cftgnn}-\textit{1-delta} and \gls{cftgnn}-\textit{spatio-temporal} generally provide the best explanations in terms of necessity while also providing comparably good performance in terms of sufficiency. 
 
 
 \begin{table}[ht]
@@ -241,13 +270,13 @@ The characterization score $char$ integrates the perspectives of sufficiency and
          \hline
          T-GNNExplainer&  $0.17$&  $0.39$&  $0.08$&  $0.40$&  $0.09$& $0.34$\\
          \gls{greedycf}-\textit{random}&  $0.04$&  $0.14$&  $0.08$&  $0.12$&  $0.09$& $0.19$\\
-         \gls{greedycf}-\textit{closest}&  $0.00$&  $0.05$&  $0.01$&  $0.03$&  $0.05$& $0.12$\\
-         \gls{greedycf}-\textit{recent}&  $0.22$&  $0.49$&  \underline{$0.50$}&  $0.47$&  $0.17$& $0.45$\\
+         \gls{greedycf}-\textit{temporal}&  $0.22$&  $0.49$&  $0.50$&  $0.47$&  $0.17$& $0.45$\\
+         \gls{greedycf}-\textit{spatio-temporal}&  \underline{$0.31$}&  $0.54$&  \underline{$0.53$}&  $0.46$&  $0.23$& $0.54$\\
          \gls{greedycf}-\textit{1-delta}&  $0.18$&  $0.51$&  $0.39$&  $0.42$&  $0.14$& $0.43$\\
-         \gls{cftgnn}-\textit{random}&  $0.19$&  $0.52$&  $0.43$&  $0.47$&  \underline{$0.24$}& $0.58$\\
-         \gls{cftgnn}-\textit{closest}&  $0.15$&  $0.40$&  $0.32$&  $0.40$&  $0.16$& $0.47$\\
-         \gls{cftgnn}-\textit{recent}&  \underline{$0.23$}&  \underline{$0.55$}&  $0.49$&  \underline{$0.54$}&  $0.22$& \underline{$0.62$}\\
- \gls{cftgnn}-\textit{1-delta}& $\textbf{0.27}$& $\textbf{0.58}$& $\textbf{0.50}$& $\textbf{0.57}$& $\textbf{0.27}$&$\textbf{0.68}$\\
+         \gls{cftgnn}-\textit{random}&  $0.19$&  $0.52$&  $0.43$&  $0.47$&  $0.24$& $0.58$\\
+         \gls{cftgnn}-\textit{temporal}&  $0.23$&  $0.55$&  $0.49$&  \underline{$0.54$}&  $0.22$& $0.62$\\
+         \gls{cftgnn}-\textit{spatio-temporal}&  $\textbf{0.31}$&  \underline{$0.57$}&  $\textbf{0.54}$&  $0.52$&  $\textbf{0.30}$& \underline{$0.65$}\\
+ \gls{cftgnn}-\textit{1-delta}& $0.27$& $\textbf{0.58}$& $0.50$& $\textbf{0.57}$& \underline{$0.27$}&$\textbf{0.68}$\\
  \hline
     \end{tabular}
     \caption{$char$ scores of the different explanation methods for explaining wrong and correct predictions. The best result is \textbf{bold}, and the second best is \underline{underlined}.}
@@ -267,7 +296,7 @@ The characterization score $char$ integrates the perspectives of sufficiency and
 \subsubsection{Study of Runtime}
 \label{s_Evaluation_Results_Runtime}
 
-Figure \ref{f_duration} shows the average time it takes the explanation approaches to explain a prediction. Across all datasets, \gls{greedycf} took the least time on average. In contrast to the other selection strategies, \gls{greedycf} with the \textit{1-delta} selection strategy took a considerably longer time for each explanation. The reason for this is that the link prediction function is called a lot more often in this strategy, which can be seen in Table \ref{t_oracle_calls}. The table also shows that in general the link prediction function is called a lot more often by \gls{cftgnn} compared to \gls{greedycf}. This is not too surprising, as \gls{greedycf} concludes upon encountering a counterfactual example or when it cannot greedily advance in its search, whereas \gls{cftgnn} only concludes after the predefined number of iterations or when the search tree is already fully explored.
+Figure \ref{f_duration} shows the average time it takes the explanation approaches to explain a prediction. Across all datasets, \gls{greedycf} took the least time on average. Within the variants of \gls{greedycf}, the \textit{1-delta} selection strategy entails a considerably longer time for each explanation. The reason for this difference is that the link prediction function is called a lot more often by \gls{greedycf}-\textit{1-delta} compared to the other variants of \gls{greedycf}. This can be seen in Table \ref{t_oracle_calls}, which shows the average number of calls the evaluated explainers make to the link prediction function. The table shows that, in general, the link prediction function is called a lot more often by \gls{cftgnn} compared to \gls{greedycf}. This is not too surprising, as \gls{greedycf} concludes upon encountering a counterfactual example or when it cannot greedily advance in its search, whereas \gls{cftgnn} only concludes after the predefined number of iterations or when the search tree is already fully explored.
 
 \begin{figure}
     \centering
@@ -277,9 +306,11 @@ Figure \ref{f_duration} shows the average time it takes the explanation approach
 \end{figure}
 
 
-Across all datasets and selection strategies, \gls{cftgnn} spends $97.85\%$ of the explanation duration on calling the link prediction function, whereas \gls{greedycf} spends $99.83\%$, and T-GNNExplainer $82.72\%$ on this. This shows that the main contributor to the runtime is the calls to the model. Using a faster model would also speed up explanation times. In contrast to the two explanation methods developed in this thesis, T-GNNExplainer spends considerably longer on the search procedure itself compared to calling the model.
+Across all datasets and selection strategies, \gls{cftgnn} spends $97.85\%$ of the explanation duration on calling the link prediction function, whereas \gls{greedycf} spends $99.83\%$, and T-GNNExplainer $82.72\%$ on this. This shows that the main contributor to the runtime is the calls to the link prediction model. Therefore, using a faster model would also speed up explanation times. In contrast to the two explanation methods developed in this thesis, T-GNNExplainer spends considerably longer on the search procedure itself compared to calling the model.
 
-As shown in Table \ref{t_oracle_calls}, the number of calls to the model that are performed by the different explanation approaches is relatively stable across the datasets. Nonetheless, the runtime of \gls{cftgnn} and \gls{greedycf} vary significantly across datasets. The reason that these approaches take more time on the Wikipedia dataset compared to the other two datasets lies in the longer time it takes to get a response from the oracle. The cause of this could lie in the fact that the Wikipedia dataset contains edge features, whereas the other two datasets do not. However, the fact that the T-GNNExplainer approach does not show this effect suggests that there may be a different cause.
+As shown in Table \ref{t_oracle_calls}, the number of calls to the model that are performed by the different explanation approaches is relatively stable across the datasets. However, comparing the runtime of \gls{cftgnn} and \gls{greedycf} across the different datasets shows a large variance. The reason that these approaches take more time on the Wikipedia dataset compared to the other two datasets lies in the longer time it takes to get a response from the targeted model. The cause of this could lie in the fact that the Wikipedia dataset contains edge features, whereas the other two datasets do not. However, the fact that the T-GNNExplainer approach does not show this effect suggests that there may be a different cause. Another difference that could account for the difference is that the Wikipedia dataset contains substantially more edges than the other datasets.
+
+In general, \gls{greedycf} achieves relatively short explanation durations. This makes it the preferable method if fast explanations are a priority.
 
 \begin{table}
     \centering
@@ -289,45 +320,35 @@ As shown in Table \ref{t_oracle_calls}, the number of calls to the model that ar
          &  \multicolumn{2}{c}{UCI-Messages}&  \multicolumn{2}{c}{UCI-Forums}&  \multicolumn{2}{c}{Wikipedia}\\
          &  Correct&  Wrong&  Correct&  Wrong&  Correct& Wrong\\
          \hline
-         \gls{greedycf}-\textit{random}&  27.10&  23.40&  24.80&  21.80&  23.15& 18.55\\
-         \gls{greedycf}-\textit{closest}&  23.90&  22.35&  24.25&  26.30&  23.35& 22.35\\
-         \gls{greedycf}-\textit{recent}&  43.70&  29.85&  36.15&  29.15&  32.30& 24.65\\
-         \gls{greedycf}-\textit{1-delta}&  100.15&  79.18&  88.10&  78.15&  80.47& 69.36\\
-         \gls{cftgnn}-\textit{random}&  287.91&  246.83&  261.13&  257.23&  284.52& 237.16\\
-         \gls{cftgnn}-\textit{closest}&  287.92&  246.61&  261.14&  257.83&  284.52& 234.00\\
-         \gls{cftgnn}-\textit{recent}&  287.92&  245.64&  261.23&  256.31&  284.85& 236.26\\
- \gls{cftgnn}-\textit{1-delta}& 346.50& 292.23& 312.00& 305.70& 339.90&272.52\\
+         \gls{greedycf}-\textit{random}&  $27.10$&  $23.40$&  $24.80$&  $21.80$&  $23.15$& $18.55$\\
+         \gls{greedycf}-\textit{temporal}&  $43.70$&  $29.85$&  $36.15$&  $29.15$&  $32.30$& $24.65$\\
+         \gls{greedycf}-\textit{spatio-temporal}&  $57.60$&  $29.40$&  $37.65$&  $35.25$&  $39.35$& $22.35$\\
+         \gls{greedycf}-\textit{1-delta}&  $100.15$&  $79.18$&  $88.10$&  $78.15$&  $80.47$& $69.36$\\
+         \gls{cftgnn}-\textit{random}&  $287.91$&  $246.83$&  $261.13$&  $257.23$&  $284.52$& $237.16$\\
+         \gls{cftgnn}-\textit{temporal}&  $287.92$&  $245.64$&  $261.23$&  $256.31$&  $284.85$& $236.26$\\
+         \gls{cftgnn}-\textit{spatio-temporal}&  $287.95$&  $245.44$&  $260.95$&  $256.44$&  $284.98$& $236.26$\\
+ \gls{cftgnn}-\textit{1-delta}& $346.50$& $292.23$& $312.00$& $305.70$& $339.90$&$272.52$\\
  \hline
     \end{tabular}
-    \caption{Average number of calls to the link prediction function of the different explanation methods for explaining wrong and correct predictions.}
+    \caption{Average number of calls to the link prediction function performed by the different explanation methods.}
     \label{t_oracle_calls}
 \end{table}
 
-
-
 \FloatBarrier
-
-\subsubsection{Study of Selection Strategies}
-\label{s_Evaluation_Results_SelectionStrategies}
-
-There exist substantial differences between the performance of \gls{greedycf} and \gls{cftgnn} depending on the selection strategy. This indicates that selecting perturbations based on these strategies influences the operations of the explanation approaches. If there were no effect of a strategy, it would be assumed to perform similar to the \textit{random} selection strategy. However, since the results for $fid_+$ and $fid_-$ do not show any strategy to have similar results as the \textit{random} selection, it is reasonable to conclude that these strategies do affect the performance. The \textit{1-delta} and \textit{recent} strategies consistently outperform the \textit{random} strategy in terms of $fid_+$, suggesting that the more \textit{recent} events tend to be more important and that looking at removing single events can provide a ranking that outperforms ranking at \textit{random} significantly. In contrast, the \textit{closest} selection strategy consistently performs worse than the '\textit{random} selection' strategy. This suggests that the spatial distance of events is less important to the predictions of the link prediction function than their temporal distance for the investigated datasets.
-
-In general, these effects are more pronounced for the \gls{greedycf} approach than for the \gls{cftgnn} approach. The reason for this could lie in the different approaches for exploring the search space that these two methods follow. \gls{cftgnn} is designed to exploit promising paths and to explore further if none of the known paths are promising. Thus it can 
-
-
 \subsubsection{Study of Search Iterations}
 \label{s_Evaluation_Results_Iterations}
 
-One of the parameters of \gls{cftgnn} is the maximum number of search iterations $it_{max}$. Throughout the experiments, this number is set to $300$. Another experiment is conducted in which the maximum number of search iterations is raised to $it_{max}=1200$ to investigate how a different number of search iterations affects the performance of \gls{cftgnn} in producing counterfactual explanations. The experiments are conducted for correct prediction on the Wikipedia dataset because this was the only setting in which \gls{greedycf} outperformed all \gls{cftgnn} variants. Figure \ref{f_fid_iteration} shows the $fid_+$ score that is achieved at a given iteration for \gls{cftgnn} paired with the two best-performing selection strategies \textit{recent} and \textit{1-delta}. In addition, it includes the $fid_+$ score reached by \gls{greedycf}-\textit{recent}, the best performing \gls{greedycf} variant. The figure demonstrates that \gls{cftgnn} already encounters most counterfactual explanations within the first $300$ search iterations. Nonetheless, increasing the number of iterations yields an increasing $fid_+$ score. While it takes the \gls{cftgnn}-\textit{1-delta} approach $644$ iterations to outperform \gls{greedycf}-\textit{recent}, it takes the \gls{cftgnn}-\textit{recent} variant $1181$ iterations. Regardless of the selection strategy, \gls{cftgnn} is guaranteed to find the minimal counterfactual example when given an unlimited number of iterations. The results of this evaluation suggest that in most cases, $300$ iterations suffice for the \gls{cftgnn}-\textit{1-delta} approach to outperform any \gls{greedycf} variant.
-
-
+One of the parameters of \gls{cftgnn} is the maximum number of search iterations $it_{max}$. Throughout the experiments, this number is set to $300$. To investigate the performance impact of the number of search iterations, another experiment is conducted in which the maximum number of search iterations is raised to $it_{max}=1200$. The experiments are conducted for correct prediction on the Wikipedia dataset because this is the only setting in which \gls{greedycf}-\textit{spatio-temporal} outperforms all \gls{cftgnn} variants. Figure \ref{f_fid_iteration} shows the $fid_+$ score that is achieved in relation to the search iterations. This means it represents the $fid_+$ score that would be achieved if the maximum number of iterations was fixed to that of the number of iterations on the x-axis. The $fid_+$ scored for the \gls{greedycf} variants are independent of the iterations variable because this explainer does not have a configurable maximum number of search iterations. 
+The figure demonstrates that all \gls{cftgnn} variants outperform their respective \gls{greedycf} counterparts at some number of maximum iterations. The number of iterations they take varies significantly, while for the \textit{random} and \textit{1-delta} selection strategies a few iterations suffice to surpass their \gls{greedycf} counterparts, it takes almost $1000$ iterations for \gls{cftgnn}-\textit{spatio-temporal} and almost $1200$ for \gls{cftgnn}-\textit{temporal}. 
 
 \begin{figure}[ht]
     \centering
     \include{figures/evaluation/fid_iteration_uci_correct}
-    \caption{$fid_+$ scores achieved at iteration.}
+    \caption{$fid_+$ scores achieved by the different explanation methods for correct predictions on the Wikipedia dataset. The $fid_+$ scores of the \gls{cftgnn} variants are depicted in relation to the number of search iterations.}
     \label{f_fid_iteration}
 \end{figure}
+
+Regardless of the selection strategy, \gls{cftgnn} is guaranteed to find the minimal counterfactual example when given an unlimited number of iterations. That is because with an unlimited number of iterations, \gls{cftgnn} traverses the entire search space, which means that it encounters all counterfactual examples that exist for any prediction instance. The fact that it takes \gls{cftgnn}-\textit{spatio-temporal} and \gls{cftgnn}-\textit{temporal} so many iterations to outperform their \gls{greedycf} counterparts suggests that the hyperparameters $\alpha$ and $\beta$ that influence the balance between exploration and exploitation require optimization. This conclusion is evident because \gls{greedycf} outperforms these \gls{cftgnn} variants up to a high number of iterations, which means that \gls{greedycf} explores parts of the search space that are not explored by \gls{cftgnn}. Since \gls{greedycf} constructs a substantially smaller partial search tree than \gls{cftgnn}, the \gls{cftgnn} variants should be able to construct a partial search tree that includes that of \gls{greedycf}. Since it evidently takes many iterations until it does so, the search may tend to explore or exploit the partial search tree too much instead.
 
 
 
@@ -335,64 +356,35 @@ One of the parameters of \gls{cftgnn} is the maximum number of search iterations
 \subsubsection{Study of Similarities in Explanations}
 \label{s_Evaluation_Results_Similarities}
 
+The similarities of explanations are studied using the Jaccard similarity between the explanations produced by the different explainers. Since the similarity results are mostly alike across the different experimental settings, Figure \ref{f_jaccard_similarity_wiki} only shows a heatmap of the Jaccard similarities between the explanations for correct predictions on the Wikipedia dataset. The results for all settings are presented in detail in Appendix \ref{s_Appendix_JaccardSimilarities}. The heatmap shows the Jaccard similarity between an explainer denoted in the column and another explainer denoted in the row.
 
-\begin{figure}
+Figure \ref{f_jaccard_similarity_wiki} shows that there is a very low similarity between the explanations produced by T-GNNExplainer and the other approaches. This result suggests that the factual explanations that T-GNNExplainer produces are substantially different from the counterfactual explanations produced by \gls{greedycf} and \gls{cftgnn}. A contributing factor to these low similarity scores is also that the explanations produced by T-GNNExplainer are generally much less sparse than those produced by the other explainers.
+
+When comparing the different \gls{greedycf} variants, a particularly high similarity exists between the explanations of \gls{greedycf}-\textit{temporal} and \gls{greedycf}-\textit{spatio-temporal}. Further, the explanations produced by \gls{greedycf}-\textit{spatio-temporal} are most similar to those produced by \gls{cftgnn} with any selection strategy.
+
+The explanations produced by the different \gls{cftgnn} variants are generally more similar to each other than those of the \gls{greedycf} variants. A particularly high similarity exists between the explanations of \gls{cftgnn}-\textit{temporal} and \gls{cftgnn}-\textit{spatio-temporal}. Furthermore, \gls{cftgnn}-\textit{temporal} and \gls{cftgnn}-\textit{spatio-temporal} also achieve a high similarity with \gls{cftgnn}-\textit{1-delta}. This suggests that the flexibility that the search procedure of \gls{cftgnn} provides, allows \gls{cftgnn} to explore similar parts of the search space regardless of the selection strategy. It also highlights the similarities between the \textit{temporal}, \textit{spatio-temporal}, and \textit{1-delta} selection strategies, as these are associated with explanations that are more similar compared to the \textit{random} selection strategy.
+
+
+\begin{figure}[ht]
     \centering
-    \include{figures/evaluation/similarity/jaccard_similarity_wiki_wrong}
-    \caption{Jaccard similarity for wrong predictions only in the Wikipedia dataset.}
+    \include{figures/evaluation/similarity/jaccard_similarity_wiki}
+    \caption{Jaccard similarity between explanations of correct predictions on the Wikipedia dataset.}
     \label{f_jaccard_similarity_wiki}
 \end{figure}
 
 
+\FloatBarrier
 
-% GraphFramEx calls for evaluating correct and wrong predictions separately
+\subsubsection{Study of Selection Strategies}
+\label{s_Evaluation_Results_SelectionStrategies}
 
+There exist substantial differences between the performance of \gls{greedycf} and \gls{cftgnn} depending on the selection strategy. This indicates that selecting events for the perturbations based on these strategies influences the operations of the explanation approaches. If there were no effect of a strategy, the explainers would be assumed to perform similarly to the \textit{random} selection strategy. However, since the results for the metrics of $fid_+$ and $fid_-$ show that for both \gls{cftgnn} and \gls{greedycf}, the \textit{random} selection strategy is mostly outperformed by the other selection strategies. This suggests that the selection strategies aid the explainers in exploring relevant areas of the search space.
 
-
-
-
-\begin{table}[ht]
-    \centering
-    \begin{tabular}{lcccccccc}
-    \hline
-         &  \multicolumn{4}{c}{Correct}&  \multicolumn{4}{c}{Wrong}\\
-         &  $fid_-$&  $fid_+$&  $sparsity$&  $sparsity_{all}$&  $fid_-$&  $fid_+$&  $sparsity$&  $sparsity_{all}$\\
-         \hline
-         T-GNNExplainer&     0.57&           0.05&   0.29&           0.29& 0.72&         0.28&       0.32&  0.35\\
-         Greedy \textit{random}&     0.28&           0.05&   0.04&           0.02& \textbf{0.99}& 0.07&      0.03&  0.02\\
-         Greedy \textit{closest}&    0.01&           0.01&   \textbf{0.02}&  0.02& \textbf{0.99}& 0.02& \underline{0.02}&  0.03\\
-         Greedy \textit{recent}&     0.61&  \textbf{0.43}&   0.04&           0.05& 0.98&         0.31&       0.03&  0.03\\
-         Greedy \textit{1-delta}&     0.64&           0.29& \underline{0.03}& 0.04& \textbf{0.99}& 0.27&\textbf{0.02}& 0.03\\
-         CoDy \textit{random}&       0.66&           0.32&   0.04&           0.09& 0.97&         0.31&       0.04& 0.06\\
-         CoDy \textit{closest}&      0.63&           0.22&   0.08&           0.08& 0.97&         0.26&       0.05& 0.05\\
-         CoDy \textit{recent}&     \underline{0.66}& 0.39&   0.07&           0.1&  0.98& \underline{0.38}&   0.04& 0.05\\
-         CoDy \textit{1-delta}&\textbf{0.68}&\underline{0.4}& 0.07&           0.09& 0.95& \textbf{0.41}&      0.04& 0.06\\
- \hline
-    \end{tabular}
-    \caption{Performance of the different explanation approaches on the UCI-Forums dataset.}
-    \label{t_results_uci_overview}
-\end{table}
+Taking a look at the results for the $fid_+$ scores achieved by the different \gls{greedycf} variants in Table \ref{t_fid_plus} and Figure \ref{f_fid_spar} clearly shows that the \textit{spatio-temporal} selection strategy is performing best overall. The \textit{temporal} selection strategy performs second best, while the \textit{1-delta} strategy comes in third. This shows that the spatial and temporal proximity of events has a large influence on the prediction of the target model for the investigated datasets. The same ranking of selection strategies also translates to the results on the characterization scores $char$ (see Table \ref{t_char}), indicating that the same findings in terms of an overarching analysis of sufficiency and necessity.
 
 
-\begin{table}[ht]
-    \centering
-    \begin{tabular}{lcccccccc}
-    \hline
-         &  \multicolumn{4}{c}{Correct}&  \multicolumn{4}{c}{Wrong}\\
-         &  $fid_-$&  $fid_+$&  $sparsity$&  $sparsity_{all}$&  $fid_-$&  $fid_+$&  $sparsity$&  $sparsity_{all}$\\
-         \hline
-         T-GNNExplainer&  \textbf{0.90}&  0.05&  0.76&  0.33&  0.69&  0.22&  0.58&  0.43\\
-         Greedy \textit{random}&  0.57&  0.05&  0.28& 0.04&  \textbf{0.93}&  0.11&  \underline{0.02}&  0.02\\
-         Greedy \textit{closest}&  0.31&  0.03&  0.45&  0.04&  \textbf{0.93}&  0.07&  0.03&  0.02\\
-         Greedy \textit{recent}&  0.77&  0.1&  0.17&  0.06&  0.90&  0.3&  0.04&  0.03\\
- Greedy \textit{1-delta}& 0.72& 0.08& 0.19& 0.05& 0.90& 0.28& \textbf{0.02}& 0.02\\
- CoDy \textit{random}& \underline{0.88}& \underline{0.14}& 0.17& 0.07& 0.88& 0.43& 0.06& 0.07\\
- CoDy \textit{closest}& 0.84& 0.09& 0.23& 0.06& 0.87& 0.33& 0.07& 0.07\\
- CoDy \textit{recent}& \underline{0.88}& 0.13& \underline{0.17}& 0.06& 0.88& \underline{0.48}& 0.05& 0.06\\
- CoDy \textit{1-delta}& \underline{0.88}& \textbf{0.16}& \textbf{0.15}& 0.07& 0.90& \textbf{0.54}& 0.04& 0.06\\
- \hline
-    \end{tabular}
-    \caption{Performance of the different explanation approaches on the Wikipedia dataset.}
-    \label{t_results_wikipedia_overview}
-\end{table}
+Shifting the view to the results for the $fid_+$ scores achieved by \gls{cftgnn} with the different selection strategies in Table \ref{t_fid_plus} and Figure \ref{f_fid_spar} shows that there is no clear best-performing selection strategy. While for explaining correct predictions, the \textit{spatio-temporal} strategy performs best and the \textit{1-delta} performs second best, it is the other way around for explaining wrong predictions. Across all settings, \gls{cftgnn}-\textit{temporal} generally performs third best in terms of $fid_+$. This ranking of selection strategies based on the necessity of explanations also transfers to a combined assessment of necessity and sufficiency using the characterization score $char$ (see Table \ref{t_char}).
 
+In general, the effects of the selection strategies on the explanatory performance are more pronounced for the \gls{greedycf} approach than for the \gls{cftgnn} approach. The reason for this could lie in the different approaches for exploring the search space that these two methods follow. \gls{cftgnn} is designed to exploit promising paths and to explore further if none of the known paths are promising. Thus, if the selection strategy does not provide good initial selections, it is incentivized to explore the search space in more breadth, compared to \gls{greedycf} for which the breadth of the search is fixed by the sampling parameter $l$.
+
+Across \gls{greedycf} and \gls{cftgnn}, the \textit{spatio-temporal} selection strategy outperforms the \textit{temporal} selection strategy in the majority of experiment settings. This relation evinces that spatial proximity is an important factor for the importance of past events to the prediction outcome of the targeted link prediction model. Thus, taking a combined spatio-temporal perspective on the past serves as a particularly useful method of informing search-based counterfactual explanation methods. Furthermore, the \textit{spatio-temporal} selection strategy has an advantage over the \textit{1-delta} strategy in terms of the time that is required for finding an explanation (see Figure \ref{f_duration}). 

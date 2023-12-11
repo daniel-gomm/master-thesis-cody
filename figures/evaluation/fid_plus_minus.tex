@@ -49,7 +49,7 @@
     title={Correct predictions},
     name=correct ucim,
     xmin=0, xmax=1,
-    ymin=0, ymax=0.45,
+    ymin=0, ymax=0.6,
     fpfm plot style]
     \addplot [ scatter, only marks, scatter src=explicit symbolic] 
     table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/ucim_fid_correct.csv};
@@ -59,7 +59,7 @@
     title={Wrong predictions},
     name=wrong ucim,
     xmin=0, xmax=1,
-    ymin=0, ymax=0.45,
+    ymin=0, ymax=0.6,
     at={(correct ucim.south east)},
     anchor=left of south west,
     xshift=5mm,
@@ -89,7 +89,7 @@
     title={Correct predictions},
     name=correct uci,
     xmin=0, xmax=1,
-    ymin=0, ymax=0.45,
+    ymin=0, ymax=0.6,
     fpfm plot style]
     \addplot [ scatter, only marks, scatter src=explicit symbolic] 
     table [x=fid_pl, y=fid_min, meta=meta, col sep=comma] {figures/evaluation/data/uci_fid_correct.csv};
@@ -99,7 +99,7 @@
     title={Wrong predictions},
     name=wrong uci,
     xmin=0, xmax=1,
-    ymin=0, ymax=0.45,
+    ymin=0, ymax=0.6,
     at={(correct uci.south east)},
     anchor=left of south west,
     xshift=5mm,
@@ -158,10 +158,10 @@
     yshift=-2.5mm,
     node font=\small,
 ] at ($ (correct wiki.below south west)!0.5!(wrong wiki.below south east) $) {
-     &\footnotesize random &\footnotesize closest &\footnotesize recent &\footnotesize 1-delta &\footnotesize no selection strategy \\
-    \footnotesize \gls{cftgnn} &  \node[marker legend,forestgreen4416044,fill=forestgreen4416044] (c) at (0,1.5mm){};  & \node[marker legend,crimson2143940,fill=crimson2143940] (c) at (0,1.5mm){};  & \node[marker legend,darkorange25512714,fill=darkorange25512714] (c) at (0,1.5mm){}; & \node[marker legend,steelblue31119180,fill=steelblue31119180] (c) at (0,1.5mm){}; & \\
+     &\footnotesize \textit{random} &\footnotesize \textit{temporal} &\footnotesize \textit{spatio-temporal} &\footnotesize \textit{1-delta} &\footnotesize no selection strategy \\
+    \footnotesize \gls{cftgnn} &  \node[marker legend,forestgreen4416044,fill=forestgreen4416044] (c) at (0,1.5mm){};  & \node[marker legend,darkorange25512714,fill=darkorange25512714] (c) at (0,1.5mm){}; & \node[marker legend,crimson2143940,fill=crimson2143940] (c) at (0,1.5mm){}; & \node[marker legend,steelblue31119180,fill=steelblue31119180] (c) at (0,1.5mm){}; & \\
     
-    \footnotesize \gls{greedycf} & \node[marker legend,forestgreen4416044] (c) at (0,1.5mm){};  & \node[marker legend,crimson2143940] (c) at (0,1.5mm){};  & \node[marker legend,darkorange25512714] (c) at (0,1.5mm){}; & \node[marker legend,steelblue31119180] (c) at (0,1.5mm){}; & \\
+    \footnotesize \gls{greedycf} & \node[marker legend,forestgreen4416044] (c) at (0,1.5mm){};  & \node[marker legend,darkorange25512714] (c) at (0,1.5mm){}; & \node[marker legend,crimson2143940] (c) at (0,1.5mm){}; & \node[marker legend,steelblue31119180] (c) at (0,1.5mm){}; & \\
     \footnotesize T-GNNExplainer &  &  &  &  & \node[isosceles triangle,isosceles triangle apex angle=60,rotate=90,draw,black25,fill=black25,scale=0.3] (c) at (0,1.5mm){};\\
 };
 
