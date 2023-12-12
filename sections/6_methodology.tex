@@ -167,7 +167,7 @@ The $\Delta$-function $\Delta(prediction_{orig}, prediction_j)$ that is used in 
 \end{equation}
 
 
-\subsection{Greedy Counterfactual Explainer for Models on Dynamic Graphs}
+\subsection{Greedy Explainer for Models on Dynamic Graphs using Counterfactuals}
 \label{s_Methodology_GreedyCF}
 
 \acrfull{greedycf} provides an uncomplicated approach for searching for counterfactual examples in the search space. It aims to keep computations to a minimum in order to quickly conclude. The search approach revolves around a greedy strategy for traversing the search space.
@@ -233,10 +233,10 @@ Figure \ref{f_GreedyBaseline} shows a simplified schema for how \gls{greedycf} o
 
 
 \FloatBarrier
-\subsection{Counterfactual Explanations for Deep Graph Models on Dynamic Graphs}
+\subsection{Counterfactual Explainer for Models on Dynamic Graphs}
 \label{s_Methodology_CoDy}
 % Add discussion of the complexity to follow up on the previous sections
-\acrfull{cftgnn} used a search algorithm that is mainly adapted from \gls{mcts} \cite{kocsis_bandit_2006, silver_mastering_2017}. The \gls{mcts} algorithm has been successfully applied to playing games \cite{silver_mastering_2017} and planning problems \cite{browne_survey_2012}. Recently, it has also been used for factual explanations on static \glspl{gnn} \cite{yuan_explainability_2021, zhang_gstarx_2022} and \glspl{tgnn} \cite{xia_explaining_2023}. 
+\acrfull{cftgnn} uses a search algorithm that is mainly adapted from \gls{mcts} \cite{kocsis_bandit_2006, silver_mastering_2017}. The \gls{mcts} algorithm has been successfully applied to playing games \cite{silver_mastering_2017} and planning problems \cite{browne_survey_2012}. Recently, it has also been used for factual explanations on static \glspl{gnn} \cite{yuan_explainability_2021, zhang_gstarx_2022} and \glspl{tgnn} \cite{xia_explaining_2023}. 
 
 To accommodate the requirements of \gls{cftgnn}, the definition of the nodes in the search tree is extended by further attributes. Definition \ref{e_search_tree_cody} replaces the initial Definition \ref{e_search_tree_simple} of the tuple-representation for nodes in the search tree.
 
@@ -252,11 +252,13 @@ This extension adds the attributes $selections_j$, $score_j$, and $selectable_j$
 
     \item \textbf{Score $score_j$}: The attribute $score_j \in (\mathbb{R} \cup \{null\})$ is used as a means to describe how promising node $n_j$ is to lead to a counterfactual example.
 
-    \item \textbf{Selectable $selectable_j$}: $selectable_j$ is a binary flag that determines whether node $n_j$ can be chosen for further exploration. It is a boolean value defined as $selectable_j \in \{0, 1\}$, where $1$ signifies that $n_j$ is selectable, and $0$ that it is not.
+    \item \textbf{Selectable $selectable_j$}: $selectable_j$ is a binary flag that determines whether node $n_j$ can be chosen for further exploration. It is a binary value defined as $selectable_j \in \{0, 1\}$, where $1$ signifies that $n_j$ is selectable, and $0$ that it is not.
 \end{itemize}
 
 
-Analogously to \gls{mcts}, the search algorithm of \gls{cftgnn} iteratively explores and expands the search tree using the results of past explorations and expansions as a guide on what to explore next \cite{browne_survey_2012}. The search operates in iterations, each iteration growing the search tree by one more node. It concludes after a predefined number of maximum iterations $it_{max}$ or when the entire search tree has been explored. At the end of the search, the algorithm selects the node associated with the minimal counterfactual example or a fallback option if no counterfactual example has been found. This fallback is introduced in Section \ref{s_Methodology_CoDy_Fallback}. One search iteration consists of the same steps as the search iterations in \gls{mcts} \cite{browne_survey_2012}: Selection, Simulation, Expansion, and Backpropagation. However, the exact implementation of these steps differs from their \gls{mcts} counterparts.
+Analogously to \gls{mcts}, the search algorithm of \gls{cftgnn} iteratively explores and expands a partial search tree using the results of past explorations and expansions as a guide on what to explore next \cite{browne_survey_2012}. The search operates in iterations, each iteration growing the partial search tree further. It concludes after a predefined number of maximum iterations $it_{max}$ or when the entire search tree has been explored. At the end of the search, the algorithm selects the node associated with the minimal counterfactual example or a fallback option if no counterfactual example has been found. This fallback is introduced in Section \ref{s_Methodology_CoDy_Fallback}. One search iteration consists of the same steps as the search iterations in \gls{mcts} \cite{browne_survey_2012}: Selection, Simulation, Expansion, and Backpropagation. However, the exact implementation of these steps differs from their \gls{mcts} counterparts.
+
+Algorithm \ref{a_CoDy} provides a high-level overview of the \gls{cftgnn} search algorithm. The algorithm takes the link prediction function $f$, the dynamic graph $\mathcal{G}$, a potential future link $\varepsilon_i$, and a selection strategy $\delta$ as input. Additionally, the algorithm is provided with a maximum number of iterations $it_{max}$. The algorithm first computes the original prediction $prediction_{orig}$ and initializes the root node $n_{root}$ of the search tree. The main search logic happens in iterations, illustrated by the while loop (lines \ref{a_CoDy_l_while_start}-\ref{a_CoDy_l_while_end}). This loop concludes after $it_{max}$ iterations or when the search tree is fully explored. A fully explored search tree is identified when the root node $n_{root}$ is not selectable anymore. This may be the case when it is not possible to find new counterfactual examples. Each iteration starts with a selection process (line \ref{a_CoDy_l_selection}). This selection process traverses the partial search tree starting at the root node. This traversal ends when a node that has not yet been expanded is encountered. This node is then returned and selected. Next, the prediction associated with the perturbation of the selected node is computed in the simulation step (line \ref{a_CoDy_l_simulation}). Subsequently, the node is expanded (line \ref{a_CoDy_l_expansion}), and finally, the results are propagated upwards through the search tree (line \ref{a_CoDy_l_backpropagation}), updating the attributes of the nodes with the new information that results from the previous steps. The search concludes by selecting the input perturbation that provides the best counterfactual explanation of the prediction among the input perturbations it explored (line \ref{a_CoDy_l_select_best}). The inner workings of these steps are the subject of the following sections.
 
 {
 \setlength{\algomargin}{1.25em}
@@ -282,27 +284,25 @@ Analogously to \gls{mcts}, the search algorithm of \gls{cftgnn} iteratively expl
 \end{algorithm}
 }
 
-Algorithm \ref{a_CoDy} provides a high-level overview of the \gls{cftgnn} search algorithm. The algorithm takes the link prediction function $f$, the dynamic graph $\mathcal{G}$, a potential future edge addition event $\varepsilon_i$, and a selection strategy $\delta$ as input. Additionally, the algorithm is provided with a maximum number of iterations $it_{max}$. The algorithm first computes the original prediction $prediction_{orig}$ and initializes the root node $n_{root}$ of the search tree. The main search logic happens in iterations, illustrated by the while loop (lines \ref{a_CoDy_l_while_start}-\ref{a_CoDy_l_while_end}). This loop concludes after $it_{max}$ iterations or when the search tree is fully explored. A fully explored search tree is identified when the root node $n_{root}$ is not selectable anymore. This may be the case when it is not possible to find new counterfactual examples. Each iteration starts with a selection process (line \ref{a_CoDy_l_selection}). This selection process traverses the partial search tree starting at the root node. This traversal ends when a node that is not yet expanded is encountered. This node is then returned and selected. Next, the prediction associated with the perturbation of the selected node is computed (line \ref{a_CoDy_l_simulation}). Subsequently, the node is expanded (line \ref{a_CoDy_l_expansion}), and finally, the results are propagated upwards through the search tree (line \ref{a_CoDy_l_backpropagation}). The search concludes by selecting the input perturbation that provides the best counterfactual explanation of the prediction that has been found (line \ref{a_CoDy_l_select_best}). The inner workings of these steps are the subject of the following sections.
-
 \FloatBarrier
 \subsubsection{Selection}
 \label{s_Methodology_CoDy_Selection}
 % The selection process starts at the root node and then recursively applies a child selection policy to traverse the tree until an expandable node is reached. A node is expandable if it has not yet undergone expansion, meaning that it does not have any child nodes and has yet to be associated with a prediction score.
 The first step in each search iteration is the selection of a new node to expand. The selection procedure initiates from the root node and subsequently employs a recursive child selection policy to traverse the partial search tree until encountering a node suitable for expansion. A node $n_j \in P$ in the partial search tree qualifies for expansion if it has not yet undergone the expansion process, implying that it is not yet associated with child nodes ($children_j = \varnothing$) and it is not yet affiliated with a prediction score ($prediction_j = null$).
 
-The child selection algorithm aims to balance the exploration of the search tree with the exploitation of already-known promising paths through the search tree. Given a node in the search tree $n_j$ that has already been expanded, the selection procedure selects one of its child nodes. The selection hinges on a score $selection\_score(n_k)$ that is calculated for all selectable children $n_k \in selectable\_children(n_j)$ of $n_j$:
+The child selection algorithm aims to balance the exploration of unknown parts of the search tree with the exploitation of already-known promising paths through the search tree. Given a node in the search tree $n_j$ that has already been expanded, the selection procedure selects one of its child nodes. The selection hinges on a score $selection\_score(n_k)$ that is calculated for each selectable child $n_k \in selectable\_children(n_j)$ of node $n_j$:
 
 \begin{equation}
     selectable\_children(n_j) = \{n_k: n_k \in children_j, \hspace{1.5mm} selectable_k = 1\}
 \end{equation}
 
-The child node $n_k$ out of the selectable children that has the highest score $selection\_score(n_k)$ is selected.
+A child node $n_k$ is part of the selectable children $selectable\_children(n_j)$ of node $n_j$ if it is marked as selectable, with a selectable attribute of $selectable_k = 1$. The child node $n_k$ out of the selectable children that has the highest score $selection\_score(n_k)$ is selected. Formally, this is given as:
 
 \begin{equation}
-    \argmax_{n_k \in selectable\_children(n_j)} selection\_score(n_k)
+    n_{best} \gets \argmax_{n_k \in selectable\_children(n_j)} selection\_score(n_k)
 \end{equation}
 
-The selection score combines the exploitation score $score_k$ associated with the node $n_k$ with an exploration score $score_{exploration}(n_k)$, which is calculated based on the node's level of past exploration.
+The selection score combines the exploitation score attribute $score_k$ associated with the node $n_k$ with an exploration score $score_{exploration}(n_k)$, which is calculated based on the node's level of past exploration. It is defined as:
 
 \begin{equation}
     selection\_score(n_k) = \alpha * score_k + \beta * score_{exploration}(n_k)
@@ -310,17 +310,17 @@ The selection score combines the exploitation score $score_k$ associated with th
 
 Here, $\alpha$ and $\beta$ are tunable hyperparameters that adjust the balance between the two terms. The exploitation term $\alpha * score(n_j)$ encourages selecting nodes already associated with a high exploitation score. In contrast, the exploration term $\beta * score_{exploration}(n_j)$ promotes the exploration of nodes with little past selections.
 
-The exploration score is adapted from the 'Upper Confidence Bound 1' introduced by \cite{auer_finite-time_2002}, which is popular across various \gls{mcts} implementations \cite{kocsis_bandit_2006, browne_survey_2012}. For a node $n_k$ with parent $n_j = parent_k$, the score is defined as:
+The exploration score is adapted from the 'Upper Confidence Bound 1' introduced in \cite{auer_finite-time_2002}, which is popular across various \gls{mcts} implementations \cite{kocsis_bandit_2006, browne_survey_2012}. For a node $n_k$ with parent $n_j = parent_k$, the score is defined as:
 
 \begin{equation}
     score_{exploration}(n_k) = \sqrt{\frac{ln(selections_j)}{selections_k}}
 \end{equation}
 
-This score $score_{exploration}(n_k)$ quantifies the uncertainty about selecting node $n_k$ \cite{auer_finite-time_2002, browne_survey_2012}. A higher exploration score means that less is known about the potential impact on the prediction that follows from selecting this node.
+This score $score_{exploration}(n_k)$ quantifies the uncertainty about selecting node $n_k$ \cite{auer_finite-time_2002, browne_survey_2012}. A higher exploration score means that less is known about the potential impact on the prediction that follows from selecting this node. The less a node $n_k$ is explored in comparison to the other children of its parent $n_j$, the higher the exploitation score for $n_k$.
 
 In contrast to the exploration score, the exploitation score $score_k$ is not calculated during the selection step. Rather, this attribute is set at the expansion step of the \gls{cftgnn} search algorithm (see Section \ref{s_Methodology_CoDy_Expansion}) and updated in the backpropagation (see Section \ref{s_Methodology_CoDy_Backpropagation}).
 
-If more than one child node has the same score, a selection strategy $\delta$ is used to select a child. This selection strategy can be any of the selection strategies introduced in Section \ref{s_Methodology_SelectionStrategies}. For example, the selection strategy is used when none of the children of a node have been expanded yet and are thus associated with the same score. The complete selection process is described in Algorithm \ref{a_MCTS_Select}, which recursively explores the search tree following the outlined procedure. The recursion ends when a node is encountered that has not yet been expanded (line \ref{a_CoDy_Select_recursion}). If multiple child nodes share the same highest selection score (line \ref{a_CoDy_Select_multiple}), the selection strategy $\delta$ is used to make the selection between the highest-ranking children.
+If more than one child node has the same selection score, a selection strategy $\delta$ is used to select a child. This selection strategy can be any of the selection strategies introduced in Section \ref{s_Methodology_SelectionStrategies}. For example, the selection strategy is used when none of the children of a node have been expanded yet and are thus associated with the same score. The complete selection process is described in Algorithm \ref{a_MCTS_Select}, which recursively explores the search tree following the outlined procedure. The recursion ends when a node is encountered that has not yet been expanded (line \ref{a_CoDy_Select_recursion}). If multiple child nodes share the same highest selection score (line \ref{a_CoDy_Select_multiple}), the selection strategy $\delta$ is used to make the selection between the highest-ranking children.
 
 {
 \setlength{\algomargin}{1.25em}
@@ -347,13 +347,13 @@ If more than one child node has the same score, a selection strategy $\delta$ is
 \FloatBarrier
 \subsubsection{Simulation}
 \label{s_Methodology_CoDy_Simulation}
-The next step after selecting a node $n_j$ is referred to as simulation. This step consists of making a call to the link prediction function $f$ to infer the prediction associated with the node. The prediction $prediction_j$ associated with the selected node $n_j$ is calculated as the prediction for the explained event $\varepsilon_i$ when the events in the perturbation set $s_j$ associated with node $n_j$ are removed from the set of past events $\mathcal{G}(t_i)$ in the original input. 
+The next step after selecting a node $n_j$ is referred to as simulation. This step consists of making a call to the link prediction function $f$ to infer the prediction associated with the selected node. The prediction $prediction_j$ associated with the selected node $n_j$ is calculated as the prediction for the explained event $\varepsilon_i$ when the events in the perturbation set $s_j$ associated with node $n_j$ are removed from the set of past events $\mathcal{G}(t_i)$ in the original input:
 
 \begin{equation}
-    prediction_j = f(\mathcal{G}(t_i) \setminus s_j, \varepsilon_i)
+    prediction_j = f((\mathcal{G}(t_i) \setminus s_j), \varepsilon_i)
 \end{equation}
 
-This procedure is outlined in Algorithm \ref{a_MCTS_Simulate}. It shows that the simulate function infers the score associated with the selected node. %This is different from traditional \gls{mcts}, where the simulation step consists of simulating the outcome of a game from that position in the search tree by randomly taking actions until the game finishes \cite{kocsis_bandit_2006}. The idea behind this simulation is to gauge how likely it is to win the game from this position \cite{kocsis_bandit_2006}. Since it is possible to infer the prediction score for the input perturbation associated with any 
+This procedure is outlined in Algorithm \ref{a_MCTS_Simulate}. It shows how the simulate function infers the score associated with the selected node. %This is different from traditional \gls{mcts}, where the simulation step consists of simulating the outcome of a game from that position in the search tree by randomly taking actions until the game finishes \cite{kocsis_bandit_2006}. The idea behind this simulation is to gauge how likely it is to win the game from this position \cite{kocsis_bandit_2006}. Since it is possible to infer the prediction score for the input perturbation associated with any 
 
 {
 \setlength{\algomargin}{1.25em}
@@ -362,7 +362,7 @@ This procedure is outlined in Algorithm \ref{a_MCTS_Simulate}. It shows that the
 \caption{Algorithm for simulating the link prediction on the selected node.}
 \label{a_MCTS_Simulate}
     \Fn{\textbf{simulate}($n_j$, $f$, $\mathcal{G}$, $\varepsilon_i$)}{
-    $prediction_j \gets f(\mathcal{G}(t_i) \setminus s_j, \varepsilon_i)$\;
+    $prediction_j \gets f((\mathcal{G}(t_i) \setminus s_j), \varepsilon_i)$\;
     return $prediction_j$\;
     }
 \end{algorithm}
@@ -372,7 +372,7 @@ This procedure is outlined in Algorithm \ref{a_MCTS_Simulate}. It shows that the
 \subsubsection{Expansion}
 \label{s_Methodology_CoDy_Expansion}
 
-Following the simulation step, the expansion step involves updating the attributes of the selected node $n_j$. The exploitation score $score_j$ is initialized as the relative magnitude of the shift between the original prediction score $prediction_{orig}$ and the prediction score linked to the expanded node $prediction_j$. If this value is negative, the exploitation score is set to $0$. 
+Following the simulation step, the expansion step involves updating the attributes of the selected node $n_j$. The exploitation score $score_j$ is initialized as the relative magnitude of the shift between the original prediction score $prediction_{orig}$ and the prediction score linked to the expanded node $prediction_j$. If this value is negative, the exploitation score is set to $0$. Formally, $score_j$ is initialized as:
 
 \begin{equation}
     \label{e_MCTS_score}
@@ -381,7 +381,7 @@ Following the simulation step, the expansion step involves updating the attribut
 
 The $\Delta$-function introduced in Section \ref{s_Methodology_SelectionStrategies} is reused here. If the score defined in \ref{e_MCTS_score} is greater than $1$, that signifies that the link prediction associated with node $n_j$ is classified differently from the original link prediction, making $s_j$ a counterfactual example.
 
-In addition to calculating the exploitation score, the expansion step also adds a set of children to the selected node, which expands the partial search tree. As discussed in Section \ref{s_Methodology_SearchSpace}, all child nodes $n_k$ of the expanded node $n_j$ have to satisfy the conditions described in Equations \ref{e_child_1}, \ref{e_child_2}, and \ref{e_child_3}. That is, the perturbation sets associated with the child nodes have to extend the perturbation set associated with the expanded node by exactly one event. Thus, the set of child nodes to the expanded node $n_j$ is given as:
+In addition to calculating the exploitation score, the expansion step also adds a set of children to the selected node, which expands the partial search tree. As discussed in Section \ref{s_Methodology_SearchSpace}, all child nodes $n_k$ of the expanded node $n_j$ have to satisfy the conditions described in Equations \ref{e_child_1}, \ref{e_child_2}, and \ref{e_child_3}. That is, the perturbation sets associated with the child nodes have to extend the perturbation set associated with the expanded node by exactly one event. Thus, the set of child nodes to the expanded node $n_j$ is initialized as:
 
 %each node $n_j \in T$ is primarily defined by its associated set of perturbations $s_j$. 
 
@@ -411,7 +411,7 @@ In addition to calculating the exploitation score, the expansion step also adds 
 
 The child nodes are initialized with $null$ values for their prediction and score attributes and an empty set of child nodes. These attributes are only assigned once any of these child nodes are selected and expanded themselves.
 
-The expansion step is summarized in Algorithm \ref{a_MCTS_Expand}. After assigning the initial score to the selected node (line \ref{a_CoDy_Expand_l_initial_score}), the function checks whether the prediction associated with the node is counterfactual to the original prediction (line \ref{a_CoDy_Expand_l_cf}). If so, the algorithm concludes and sets the selectable flag $selectable_j$ to $0$, which prevents future selections of node $n_j$. It would not make sense to select $n_j$ again, as it already constitutes a counterfactual example. Further deepening the search tree from node $n_j$ could only encounter counterfactual examples with higher complexity, violating the objective of minimizing complexity. In the case that the prediction associated with the selected node $n_j$ is not counterfactual to the original prediction, the child nodes $children_j$ are initialized (line \ref{a_CoDy_Expand_l_init_children}).
+The expansion step is summarized in Algorithm \ref{a_MCTS_Expand}. After assigning the initial score to the selected node (line \ref{a_CoDy_Expand_l_initial_score}), the function checks whether the prediction associated with the node is counterfactual to the original prediction (line \ref{a_CoDy_Expand_l_cf}). If so, the algorithm concludes and sets the selectable flag $selectable_j$ to $0$, which prevents future selections of node $n_j$. It would not make sense to select $n_j$ again, as it already constitutes a counterfactual example. Further deepening the search tree from node $n_j$ could only encounter counterfactual examples with higher complexity, violating the objective of minimizing complexity. In the case that the prediction associated with the selected node $n_j$ is not counterfactual to the original prediction, the child nodes $children_j$ are initialized (line \ref{a_CoDy_Expand_l_init_children}). If there are no child nodes, the node $n_j$ is marked as not selectable (line \ref{a_CoDy_Expand_l_no_children}).
 
 {
 \setlength{\algomargin}{1.25em}
@@ -428,6 +428,9 @@ The expansion step is summarized in Algorithm \ref{a_MCTS_Expand}. After assigni
             Add $n_j$ to a list of counterfactual examples $cf\_examples$\;
         }\Else{
             $children_j \gets \{(s_k, null, n_j, \varnothing, 0, null, 1): s_k \in \hat{S}_{\varepsilon_j} \hspace{1.5mm} \mathrm{with} \hspace{1.5mm} |s_k| = |s_j| + 1, s_j \subset s_k\}$\; \label{a_CoDy_Expand_l_init_children}
+            \If{$children_j = \varnothing$}{
+                $selectable_j \gets 0$\;\label{a_CoDy_Expand_l_no_children}
+            }
         }
     }
 \end{algorithm}
@@ -436,7 +439,7 @@ The expansion step is summarized in Algorithm \ref{a_MCTS_Expand}. After assigni
 \subsubsection{Backpropagation}
 \label{s_Methodology_CoDy_Backpropagation}
 
-Backpropagation is the last step in the search iteration. It serves to update information in the search tree starting at the parent $n_p$ of the expanded node $n_j$, recursively traversing backward through the search tree until the root node is reached. The backpropagation increments the number of selections by one, updates the exploitation score, and checks if the node is still selectable.
+Backpropagation is the last step in each search iteration. It serves to update information in the search tree starting at the parent $n_p$ of the expanded node $n_j$, recursively traversing backward through the search tree until the root node is reached. The backpropagation increments the number of selections by one, updates the exploitation score, and checks if the node is still selectable.
 
 The exploitation score $score_j$ of a node $n_j$ is updated to estimate the potential for finding a counterfactual example among its descendants. It is thus calculated as the weighted average of the exploitation scores of its children and the initial exploitation score associated with $n_j$ itself. The initial exploitation score results from the expansion step and is calculated according to Equation \ref{e_MCTS_score}. Thus, the update is computed as follows:
 %to a weighted average of its initial exploitation score as presented in \ref{e_MCTS_score} and the exploitation scores of its children. The exploitation score of a child $n_k$ is weighted with its number of selections $selections_k$:
@@ -449,9 +452,9 @@ The exploitation score $score_j$ of a node $n_j$ is updated to estimate the pote
     }
 \end{equation}
 
-To estimate the potential for finding a counterfactual example among the descendants of node $n_j$, the exploitation scores of each child node $n_k$ are weighted with its number of selections $selections_k$. This follows the assumption that the more a node is selected, the more accurate its estimation should become.
+To estimate the potential for finding a counterfactual example among the descendants of node $n_j$, the exploitation scores of each child node $n_k$ is weighted with its number of selections $selections_k$. This follows the assumption that the more a node is selected, the more accurate its estimation should become.
 
-Algorithm \ref{a_MCTS_Backpropagation} presents the full backpropagation procedure. For easier readability, the update of the exploitation score is presented over lines \ref{a_CoDy_Backprop_score_update_start}-\ref{a_CoDy_Backprop_score_update_end}. The backpropagation also checks if any of the child nodes is selectable. If no child node is selectable, the partial search tree cannot be expanded from any of the descendant nodes. Thus, the node is marked as not selectable itself. The backpropagation concludes when it reaches the root node (line \ref{a_CoDy_Backprop_return}).
+Algorithm \ref{a_MCTS_Backpropagation} presents the full backpropagation procedure. For easier readability, the update of the exploitation score is presented over lines \ref{a_CoDy_Backprop_score_update_start}-\ref{a_CoDy_Backprop_score_update_end}. The backpropagation also checks if any of the child nodes is selectable. If no child node is selectable, the partial search tree cannot be expanded from any of the descendant nodes. Thus, the node is marked as not selectable itself (line \ref{a_CoDy_Backprop_score_not_selectable}). The backpropagation concludes when it reaches the root node (line \ref{a_CoDy_Backprop_return}).
 
 {
 \setlength{\algomargin}{1.25em}
@@ -467,6 +470,9 @@ Algorithm \ref{a_MCTS_Backpropagation} presents the full backpropagation procedu
         $score_j \gets \max\left(0, \frac{\Delta(prediction_{orig}, prediction_j)}{|prediction_{orig}|}\right)$\; \label{a_CoDy_Backprop_score_update_start}
         $score_j \gets score_j + \sum_{n_k \in children_j} (score_k * selections_k)$\;
         $score_j \gets \frac{score_j}{selections_j}$\; \label{a_CoDy_Backprop_score_update_end}
+        \If{No child in $children_j$ is selectable}{
+            $selectable_j \gets 0$\; \label{a_CoDy_Backprop_score_not_selectable}
+        }
     }
 \end{algorithm}
 }
@@ -568,6 +574,6 @@ Figure \ref{f_search_example} exemplifies the operations of the search algorithm
     \label{f_search_example}
 \end{figure}
 
-Simulating on the root node produces the original prediction score, which is $3.179$ in this case. This score means that the potential future edge addition event $\varepsilon_i$ is classified to occur. The expansion step in the first iteration adds new child nodes to the root, one for each of the candidate events. Let $s_1 = \{\varepsilon_1\}, s_2 = \{\varepsilon_2\}, s_3 = \{\varepsilon_3\}$. Since none of the child nodes of the root have been explored to this point, the second iteration employs the selection strategy $\delta$ to select node $n_2$. After simulation, this node is expanded, adding two child nodes associated with the input perturbations $s_4 = \{\varepsilon_1, \varepsilon_2\}$, and $s_5 = \{\varepsilon_2, \varepsilon_3\}$. Iteration $3$ selects node $n_5$. The expansion only adds a single child node associated with $s_6 = \{\varepsilon_1, \varepsilon_2, \varepsilon_3\}$. In iteration $4$, the newly added child node $n_6$ is selected. Since it has no children, backpropagation marks the node as no longer selectable. The same applies to its parent node $n_5$. In iteration $5$, the exploration score associated with the unexplored children of the root node is large enough so that $n_2$ is no longer selected over the unexplored alternatives. Thus, $\delta$ is applied, resulting in the selection of node $n_1$. The simulation of $n_1$ yields a negative score, meaning that its associated perturbation constitutes a counterfactual example. Following the optimization of dynamic constraints on the search space, all nodes associated with a perturbation set that contains more than one element are marked as no longer selectable. In this instance, this applies to node $n_4$. Marking node $n_4$ as not selectable also makes node $n_2$ no longer selectable since none of its children remain selectable. Thus, in the final iteration, node $n_3$ is selected as the only option. After this iteration, none of the nodes remain selectable, meaning that the search tree is fully explored and the search can conclude. As node $n_1$ is the only node associated with a counterfactual example, it is selected as the best node, and the input perturbation $s_1 = \{\varepsilon_1\}$ is returned as the minimal counterfactual example.
+Simulating on the root node produces the original prediction score, which is $3.179$ in this case. This score means that the potential future link $\varepsilon_i$ is classified to occur. The expansion step in the first iteration adds new child nodes to the root, one for each of the candidate events. Let $s_1 = \{\varepsilon_1\}, s_2 = \{\varepsilon_2\}, s_3 = \{\varepsilon_3\}$. Since none of the child nodes of the root have been explored to this point, the second iteration employs the selection strategy $\delta$ to select node $n_2$. After simulation, this node is expanded, adding two child nodes associated with the input perturbations $s_4 = \{\varepsilon_1, \varepsilon_2\}$, and $s_5 = \{\varepsilon_2, \varepsilon_3\}$. Iteration $3$ selects node $n_5$. The expansion only adds a single child node associated with $s_6 = \{\varepsilon_1, \varepsilon_2, \varepsilon_3\}$. In iteration $4$, the newly added child node $n_6$ is selected. Since it has no children, backpropagation marks the node as no longer selectable. The same applies to its parent node $n_5$. In iteration $5$, the exploration score associated with the unexplored children of the root node is large enough so that $n_2$ is no longer selected over the unexplored alternatives. Thus, $\delta$ is applied, resulting in the selection of node $n_1$. The simulation of $n_1$ yields a negative score, meaning that its associated perturbation constitutes a counterfactual example. Following the optimization of dynamic constraints on the search space, all nodes associated with a perturbation set that contains more than one element are marked as no longer selectable. In this instance, this applies to node $n_4$. Marking node $n_4$ as not selectable also makes node $n_2$ no longer selectable since none of its children remain selectable. Thus, in the final iteration, node $n_3$ is selected as the only option. After this iteration, none of the nodes remain selectable, meaning that the search tree is fully explored and the search can conclude. As node $n_1$ is the only node associated with a counterfactual example, it is selected as the best node, and the input perturbation $s_1 = \{\varepsilon_1\}$ is returned as the minimal counterfactual example.
 
 
