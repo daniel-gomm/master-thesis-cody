@@ -40,7 +40,7 @@ A counterfactual example $\mathcal{X}_{\varepsilon_i}$ to a model's prediction o
 
 \begin{equation}
     \label{e_CFExplanation}
-    p(f(\mathcal{G}(t_i), \varepsilon_{i})) \neq p(f(\mathcal{G}(t_i) \setminus \mathcal{X}_{\varepsilon_i}, \varepsilon_{i}))
+    p(f(\mathcal{G}(t_i), \varepsilon_{i})) \neq p(f((\mathcal{G}(t_i) \setminus \mathcal{X}_{\varepsilon_i}), \varepsilon_{i}))
 \end{equation}
 
 For any potential future link $\varepsilon_{i}$, there may exist multiple counterfactual examples or no counterfactual example at all. The set containing all existing counterfactual examples for a potential future link $\varepsilon_{i}$ is denoted as $\Psi_{\varepsilon_i}$.
@@ -49,7 +49,7 @@ A counterfactual explainer for the future link prediction task $ex$ is defined a
 
 \begin{equation}
     \label{e_Explainer}
-    ex: \{f, \mathcal{G}(t_i), \varepsilon_i\} \rightarrow \bigcup_{k = 0}^{|\mathcal{G}(t_i) \setminus \varepsilon_i|} {\mathcal{G}(t_i) \setminus \varepsilon_i \choose k}
+    ex: \{f, \mathcal{G}(t_i), \varepsilon_i\} \rightarrow \bigcup_{k = 0}^{|(\mathcal{G}(t_i) \setminus \varepsilon_i)|} {(\mathcal{G}(t_i) \setminus \varepsilon_i) \choose k}
 \end{equation}
 
 The definition constrains the output of the explainer to any combination of past events. This definition follows the notation in \cite{stanley_enumerative_1986} for representing the set of all permutations of a particular size $k$.
