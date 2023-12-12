@@ -54,6 +54,8 @@ A counterfactual explainer for the future link prediction task $ex$ is defined a
 
 The definition constrains the output of the explainer to any combination of past events. This definition follows the notation in \cite{stanley_enumerative_1986} for representing the set of all permutations of a particular size $k$.
 
+\newpage
+
 \subsection{Objectives of the Explainer}
 \label{s_ProblemFormulation_Objectives}
 
@@ -71,7 +73,7 @@ Explaining future link predictions using counterfactual examples entails two pri
         \label{e_minCFExampleSize}
         \argmin_{\mathcal{X}_{\varepsilon_i}^j \in \Psi_{\varepsilon_i}} |\mathcal{X}_{\varepsilon_i}^j|
     \end{equation}
-    where the function $|\mathcal{X}_{\varepsilon_i}^j|$ returns the number of events that comprise explanation $\mathcal{X}_{\varepsilon_i}^j$.
+    where the function $|\mathcal{X}_{\varepsilon_i}^j|$ returns the number of events that comprise $\mathcal{X}_{\varepsilon_i}^j$.
 \end{enumerate}
 
 %To pursue the first objective, the explainer $ex(\cdot)$ should maximize the following expression:

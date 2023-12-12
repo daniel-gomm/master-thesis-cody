@@ -92,16 +92,50 @@
 \subsection{Jaccard Similarities between explanation approaches}
 \label{s_Appendix_JaccardSimilarities}
 
+This section presents the Jaccard similarities achieved for the different experimental settings.
+
+\begin{figure}[ht]
+    \centering
+    \include{figures/evaluation/similarity/jaccard_ucim}
+    \caption{Results on the Jaccard similarity between explanations of correct predictions on the UCI-Messages dataset.}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \include{figures/evaluation/similarity/jaccard_ucim_wrong}
+    \caption{Results on the Jaccard similarity between explanations of wrong predictions on the UCI-Messages dataset.}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \include{figures/evaluation/similarity/jaccard_uci}
+    \caption{Results on the Jaccard similarity between explanations of correct predictions on the UCI-Forums dataset.}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \include{figures/evaluation/similarity/jaccard_uci_wron}
+    \caption{Results on the Jaccard similarity between explanations of wrong predictions on the UCI-Forums dataset.}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \include{figures/evaluation/similarity/jaccard_similarity_wiki}
+    \caption{Results on the Jaccard similarity between explanations of correct predictions on the Wikipedia dataset.}
+\end{figure}
+
 \begin{figure}[ht]
     \centering
     \include{figures/evaluation/similarity/jaccard_similarity_wiki_wrong}
-    \caption{Jaccard similarity between explanations of wrong predictions on the Wikipedia dataset.}
+    \caption{Results on the Jaccard similarity between explanations of wrong predictions on the Wikipedia dataset.}
 \end{figure}
 
 
 
+\subsection{Sparsity of Necessary and Sufficient Explanations}
+\label{s_Appendix_spar_nec_suf}
 
-
+This section presents the $sparsity$ values that are achieved by the different explanation methods when only assessing either the necessary or the sufficient explanations. The results are mostly in line with the overall sparsity scores reported in the evaluation in Section \ref{s_Evaluation_Results_Neccesity}.
 
 \begin{table}[ht]
     \centering
@@ -122,7 +156,7 @@
  \gls{cftgnn}-\textit{local-gradient}& $0.05$& $0.04$& $0.07$& $0.04$& $0.15$&$0.04$\\
  \hline
     \end{tabular}
-    \caption{$sparsity$ values when only considering necessary explanations.}
+    \caption{Results on $sparsity$ values when only considering necessary explanations.}
     \label{t_spar_nec}
 \end{table}
 
@@ -146,6 +180,6 @@
  \gls{cftgnn}-\textit{local-gradient}& $0.08$& $0.05$& $0.10$& $0.05$& $0.08$&$0.06$\\
  \hline
     \end{tabular}
-    \caption{$sparsity$ values when only considering sufficient explanations.}
+    \caption{Results on $sparsity$ values when only considering sufficient explanations.}
     \label{t_spar_suf}
 \end{table}

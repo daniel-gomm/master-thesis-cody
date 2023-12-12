@@ -1,5 +1,5 @@
 \tikzset{
-  basic/.style  = {thin, align=center, level distance=30mm},
+  basic/.style  = {thin, align=center, level distance=27mm},
   root/.style   = {basic},
   level 2/.style = {basic, sibling distance=40mm},
   level 3/.style = {basic, sibling distance=30mm},
@@ -7,7 +7,7 @@
         every child/.append style={
         basic/.style={draw=none}}},
 }
-\begin{tikzpicture}[level 1/.style={sibling distance=80mm, level distance=30mm}, >=latex]
+\begin{tikzpicture}[level 1/.style={sibling distance=80mm, level distance=27mm}, >=latex]
 \footnotesize
     \node [root] (r) {$n_0 = (\varnothing, 0.98, null, \{n_1, n_2,...\})$}
       child {

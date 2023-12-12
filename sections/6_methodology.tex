@@ -119,9 +119,9 @@ Figure \ref{f_SearchTree_Example} illustrates a search tree. Following the leftm
     \label{f_SearchTree_Example}
 \end{figure}
 
-Organizing the search tree in this manner reflects the objectives of the explainer (Section \ref{s_ProblemFormulation_Objectives}). The increasing size of the associated candidate perturbations with increasing depth is tethered to minimizing the complexity of the encountered counterfactual examples. It allows the exploration of low-complexity explanation candidates without expanding and traversing the partial search tree to large depths. The complexity of potential counterfactual explanations increases with the distance to the root node. The goal of maximizing discoveries is pursued in the consecutive pruning approach. This allows a search algorithm to follow paths on the search tree that are promising for leading to a counterfactual example.
+Organizing the search tree in this manner reflects the objectives of the explainer (Section \ref{s_ProblemFormulation_Objectives}). The increasing size of the associated candidate perturbations with increasing depth is tethered to minimizing the complexity of the counterfactual explanation. It allows the exploration of low-complexity explanation candidates without expanding and traversing the partial search tree to large depths. The complexity of associated perturbation sets increases with the distance to the root node. The goal of maximizing discoveries is pursued in the consecutive pruning approach. This allows a search algorithm to follow paths on the search tree that are promising for leading to a counterfactual example.
 
-\gls{greedycf} and \gls{cftgnn} build upon this search tree. Like the search space, the complete search tree $T$ is too large to construct fully. Thus, the search approaches only construct a partial search tree $P$. During the search, the partial search tree $P$ is iteratively expanded, starting from the root node. Expansion refers to the addition of a new node to the partial search tree. While both explainers share this framework for structuring the search space, the search strategies they employ vary significantly.
+\gls{greedycf} and \gls{cftgnn} build upon this search tree. Like the search space, the complete search tree $T$ is too large to construct fully. Thus, the search approaches only construct a partial search tree $P$. In the search, the partial search tree $P$ is iteratively expanded, starting from the root node. Expansion refers to the addition of a new node to the partial search tree. While both explainers share this framework for structuring the search space, the search strategies they employ vary significantly.
 
 %\gls{cftgnn} builds upon this search tree. It combines two main components: A search algorithm that balances exploration, venturing into unexplored areas of the search space \cite{browne_survey_2012}, with exploitation, looking into promising areas of the search space \cite{browne_survey_2012}. The search algorithm is tasked with selecting a node to expand in each iteration of the search and a selection strategy that guides the search algorithms on selecting yet unexplored nodes.
 
@@ -209,6 +209,8 @@ The algorithm greedily follows the most promising path through the search tree, 
 
 
 A total of $l$ child nodes are sampled in each iteration. The sampling process is guided by the selection strategy $\delta$. From all possible child nodes, only the $l$ that rank the highest according to $\delta$ are sampled. When sampling the child nodes, they are directly associated with their corresponding prediction attribute. 
+
+\newpage
 
 Next, out of the sampled children $children_{best}$, the child that shifts the prediction most towards changing signs is selected and assigned as best child node $n_{best\_child}$. To infer how much each of the children shifts the prediction, the $\Delta$-function that has been introduced in Section \ref{s_Methodology_SelectionStrategies} is used. Formally, the best child node is determined as:
 
@@ -343,6 +345,8 @@ If more than one child node has the same selection score, a selection strategy $
     }
 \end{algorithm}
 }
+
+\newpage
 
 \FloatBarrier
 \subsubsection{Simulation}

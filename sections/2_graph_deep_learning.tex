@@ -17,6 +17,8 @@ Two vertices $v_0, v_n \in V$ can be linked by a walk $W(v_0, v_n)$, which is an
 
 Furthermore, there exist different fundamental graph types. The graph types provide a richer vocabulary for modeling complex relationships and structures. The important graph types in the scope of this thesis are listed in the following.
 
+\vspace{1.5cm}
+
 \begin{itemize}
     \item In a \textbf{directed graph} each edge $e_i \in E$ connecting vertices $v_j \in V$ and $v_k \in V$ has a designated stating point and end point \cite{diestel_graph_2017}. Therefore, each edge is represented as tuple $e_i = (v_j, v_k)$ with initial vertex $v_j$ and terminal vertex $v_k$. 
     
@@ -52,6 +54,8 @@ The local neighborhood $N_1(v_i)$ is also referred to as the $1$-hop-neighborhoo
 The graphs presented up to this point are commonly referred to as static graphs \cite{kazemi_representation_2019, rossi_temporal_2020, you_roland_2022} because they capture relationships that remain constant. However, the real world rarely remains static; it continuously evolves, adapts, and undergoes change. To address the need for modeling these dynamic transformations, the concepts of static graphs are extended by a temporal dimension to encompass so-called dynamic graphs. Dynamic graphs introduce the element of time, allowing the capture of how relationships evolve and persist over time. In doing so, they provide a richer, more nuanced understanding of interconnected systems, closely mirroring real-world processes \cite{you_roland_2022, xu_inductive_2020, trivedi_dyrep_2019}. Examples of real-world processes that are best modeled as dynamic graphs are social networks, in which connections between individuals constantly form and end, and road networks with traffic information that continuously changes.
 
 Two main approaches for modeling dynamic graphs have been proposed: First, modeling evolving graphs as a series of different static snapshots of a graph, so-called \acrfullpl{dtdg} \cite{he_explainer_2022, xie_explaining_2022}. Second, modeling dynamic graphs as a timed list of interaction events, so-called \acrfullpl{ctdg} \cite{rossi_temporal_2020, trivedi_dyrep_2019}. In the following sections, these approaches are explored to establish the foundation of this work.
+
+\newpage
 
 \subsubsection{Discrete-Time Dynamic Graphs}
 \label{s_Background_Graphs_DTDGs}
@@ -92,6 +96,8 @@ Depending on whether an event $\varepsilon_i$ is a node-wise event or an interac
 
 The node set $V$ and the edge set $E$ include all nodes and edges that are involved in any event in $\mathcal{G}$. A snapshot $G_{t_i} = (V_{t_i}, E_{t_i})$ of a \gls{ctdg} $\mathcal{G}$ is a representation of $\mathcal{G}$ at time $t_i$ as a static graph. $V_{t_i}$ is the node set and $E_{t_i}$ the edge set in the snapshot $G_{t_i}$. The snapshot $G_{t_i}$ at time $t_i$ is constructed from all events $\mathcal{G}(t_i) = \{\varepsilon_1, \varepsilon_2, ..., \varepsilon_i\}$ that occurred before or at timestamp $t_i$.
 
+\newpage
+
 % For any timestamp $t_i$ a snapshot $G_{t_i}$ of $\mathcal{G}$ at that particular time is defined by all past events $\mathcal{G}(t_i) = \{\varepsilon_{j} | j = 1,...,i\}$.
 
 As in \glspl{dtdg}, the temporal $1$-hop-neighborhood of a node $v_i \in V$ at time $t_l$ is defined as $N_1(v_i, t_l) = \{v_j \in V_{t_l} | (v_i, v_j) \in E_{t_l}\}$. The temporal-$k$-hop-neighborhood consists of those nodes $v_j \in V_{t_l}$ that are connected to $v_i$ with a walk in $E_{t_l}$ that has a length of at most $k$.
@@ -99,8 +105,6 @@ As in \glspl{dtdg}, the temporal $1$-hop-neighborhood of a node $v_i \in V$ at t
 %The concept of temporal neighborhoods is extended from nodes to events. The temporal $k$-hop-neighborhood $N_k(\varepsilon_i)$ of an event $\varepsilon_{i}$ consists of those events $\varepsilon_{j} \in \mathcal{G}(t_i) \setminus \varepsilon_{i}$ for which any node involved in event $\varepsilon_{i}$ is in the temporal $k$-hop-neighborhood of any node involved in the event $\varepsilon_{j}$.
 
 For \glspl{ctdg}, the concept of temporal neighborhoods is extended from nodes to events. The temporal $k$-hop-neighborhood $N_k(\varepsilon_i)$ of an event $\varepsilon_{i}$ consists of those past events that involve nodes that are in the temporal $k$-hop-neighborhood of the nodes involved in the event $\varepsilon_{i}$. This means an event $\varepsilon_{j} \in (\mathcal{G}(t_i) \setminus \varepsilon_{i})$ is in the temporal $k$-hop-neighborhood of $\varepsilon_{i}$ if any node involved in event $\varepsilon_{i}$ is in the temporal $k$-hop-neighborhood of any node involved in the event $\varepsilon_{j}$.
-
-\vspace{5mm}
 
 Table \ref{t_ctdg_events} and Figure \ref{f_ctdg} illustrate an example of a \gls{ctdg} $\mathcal{G}$, showing the events in Table \ref{t_ctdg_events} and the evolving graph in Figure \ref{f_ctdg}. Table \ref{t_ctdg_events} demonstrates that this representation provides a highly detailed yet compact representation of the dynamic graph evolution. This is a significant advantage over the representation as \gls{dtdg} \cite{trivedi_dyrep_2019}. The drawback of \glspl{ctdg} is that an evaluation of the graph's state at any given timestamp necessitates the examination of all past events and the assembly of the graph at that specific moment. In comparison, the snapshots that comprise a \gls{dtdg} already have a graph structure.
 
@@ -130,7 +134,7 @@ Table \ref{t_ctdg_events} and Figure \ref{f_ctdg} illustrate an example of a \gl
     \label{f_ctdg}
 \end{figure}
 
-
+\FloatBarrier
 \subsection{Geometric Deep Learning}
 \label{s_Background_GeometricDeepLearning}
 
@@ -143,8 +147,6 @@ A major hurdle for applying deep learning methods to graphs lies in their underl
 The key structural property that provides a symmetry in graphs is that nodes in a graph are provided without a fixed order \cite{bronstein_geometric_2021}. This means that the output of functions on graphs should be independent of the order of the nodes \cite{bronstein_geometric_2021}. A function that satisfies this condition is called a permutation invariant function \cite{bronstein_geometric_2021}. An example of a permutation invariant function on a set of numbers is the arithmetic mean function, which provides the same output regardless of the order of the numbers in the set.
 
 Deep learning methods that apply permutation invariant functions to graph data are referred to as \acrfullpl{gnn} \cite{bronstein_geometric_2021}. The following section covers the specifics of how these models translate the findings of geometric deep learning to actual deep neural models.
-
-
 
 
 
@@ -169,6 +171,8 @@ Deep learning methods that apply permutation invariant functions to graph data a
 
 \glspl{gnn} are potent tools for various learning tasks on relational and interaction data. They find successful applications in many domains, including drug discovery \cite{dauparas_robust_2022}, weather forecasting \cite{lam_graphcast_2022}, and reasoning on knowledge graphs \cite{huang_few-shot_2022}. 
 %They achieve this performance by exploiting the properties of the permutation group underlying graph data \cite{bronstein_geometric_2021}.
+
+\newpage
 
 The applications of \glspl{gnn} are diverse, but their tasks are often similar. The common tasks are node, edge, and graph classification, node regression, and link prediction \cite{wu_comprehensive_2021, zhou_graph_2020}.
 \begin{itemize}
@@ -230,7 +234,7 @@ Fundamental differences in \glspl{gnn} architectures arise in the encoder. While
     h_{v_i}^l = \sigma(h_{v_i}^{l-1}, \underset{v_j \in N_1(v_i)}{\oplus} \psi(h_{v_j}^{l-1}, \cdots))
 \end{equation}
 
-Here, permutation invariance is achieved by aggregating the features of the local neighborhood $N_1(v_i)$ of node $v_i \in V$ from the previous layer with a permutation invariant function $\oplus$. For example, this can be the sum, mean, or maximum function \cite{bronstein_geometric_2021}. The function $\psi$ is dependent on the exact \gls{gnn} implementation and it represents the main differentiating factor of \gls{gnn} architectures. $\psi$ is applied to each node $v_j$ in the local neighborhood of $v_i$. It takes the updated features $h_{v_j}^{l-1}$ from the previous \gls{gnn} layer as input alongside other implementation-specific features.
+Here, permutation invariance is achieved by aggregating features of the local neighborhood $N_1(v_i)$ of node $v_i \in V$ from the previous layer with a permutation invariant function $\oplus$. For example, this can be the sum, mean, or maximum function \cite{bronstein_geometric_2021}. The function $\psi$ is dependent on the exact \gls{gnn} implementation and it represents the main differentiating factor of \gls{gnn} architectures. $\psi$ is applied to each node $v_j$ in the local neighborhood of $v_i$. It takes the updated features $h_{v_j}^{l-1}$ from the previous \gls{gnn} layer as input alongside other implementation-specific features.
 
 Following Bronstein et al. \cite{bronstein_geometric_2021}, most \gls{gnn} architectures are derived from one of three types of \gls{gnn} layers. These layer types are mainly differentiated by how the permutation invariant function $\sigma$ transforms the neighborhood features through different realizations of $\psi$.
 
@@ -262,7 +266,7 @@ Many approaches combine \gls{gnn} layers developed for static \glspl{gnn} with \
 %These outputs of the last layer of a \gls{tgnn} are considered as such node-embeddings and are referred to as $h_{v_i}(t_j)$, representing the embedding of node $v_i \in V$ at time $t_j$.
 The following sections generalize common \gls{tgnn} approaches for both types of temporal graph representations with a unified notation.
 
-\subsubsection{Temporal Graph Neural Networks for Discrete Time Dynamic Graphs}
+\subsubsection{Temporal Graph Neural Networks for Discrete-Time Dynamic Graphs}
 \label{s_tgnns_for_dtdgs}
 \glspl{tgnn} for \glspl{dtdg} combine an approach for handling snapshots of the entire graph at each time point with a mechanism for learning temporal dependencies across time steps \cite{longa_graph_2023}. The most common approach is to evolve embeddings produced by a static \gls{gnn} over time \cite{longa_graph_2023}. Hence, a permutation invariant function $\sigma$, which is adapted from the permutation invariant function in static \glspl{gnn}, is employed in this context. Formally, this function is adjusted to calculate updated features of node $v_i \in V$ at a given time $t \in \{1,...,T\}$ as follows:
 
@@ -278,7 +282,9 @@ $\sigma$ is combined with a temporal update function $\phi$ to obtain the update
 \end{equation}
 The temporal update function $\phi$ encodes the temporal dynamics by including the node representation of the last timestep $h_{v_i}^{l}(t-1)$ \cite{longa_graph_2023}. The update function might take additional arguments, depending on the specific implementation. There exist various implementations of the permutation invariant function $\sigma$ and the temporal update function $\phi$ \cite{longa_graph_2023}. These include using self-attention \cite{sankar_dysat_2020}, or \glspl{rnn} like a \gls{gru} \cite{you_roland_2022}.
 
-\subsubsection{Temporal Graph Neural Networks for Continuous Time Dynamic Graphs}
+\newpage
+
+\subsubsection{Temporal Graph Neural Networks for Continuous-Time Dynamic Graphs}
 \label{s_tgnns_for_ctdgs}
 \gls{tgnn} methods for \glspl{ctdg} effectively handle sequences of events by integrating methods that refresh a node's representation whenever an event related to that node takes place \cite{longa_graph_2023}. They represent an extension of static \glspl{gnn} because they merge and aggregate node representations within temporal neighborhoods \cite{longa_graph_2023}.
 
