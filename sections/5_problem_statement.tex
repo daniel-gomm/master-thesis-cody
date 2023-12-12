@@ -36,7 +36,7 @@ As discussed in Section \ref{s_ExplainingGNNs}, counterfactual explanations are 
 
 %They are thus particularly well-suited for explaining predictions in the context of future link prediction by difficult-to-understand deep graph models like \glspl{tgnn}.
 
-A counterfactual example $\mathcal{X}_{\varepsilon_i}$ to a model's prediction on the occurrence of a future edge addition event $\varepsilon_{i}$ consist of a subset of past events $\mathcal{X}_{\varepsilon_i} \subseteq \mathcal{G}(t_i)$. To be considered counterfactual, the subset has to be necessary to produce the original prediction, satisfying the following condition:
+A counterfactual example $\mathcal{X}_{\varepsilon_i}$ to a model's prediction on the occurrence of a future link $\varepsilon_{i}$ consist of a subset of past events $\mathcal{X}_{\varepsilon_i} \subseteq \mathcal{G}(t_i)$. To be considered counterfactual, the subset has to be necessary to produce the original prediction, satisfying the following condition:
 
 \begin{equation}
     \label{e_CFExplanation}
@@ -45,14 +45,14 @@ A counterfactual example $\mathcal{X}_{\varepsilon_i}$ to a model's prediction o
 
 For any potential future link $\varepsilon_{i}$, there may exist multiple counterfactual examples or no counterfactual example at all. The set containing all existing counterfactual examples for a potential future link $\varepsilon_{i}$ is denoted as $\Psi_{\varepsilon_i}$.
 
-A counterfactual explainer for the future link prediction task $ex$ is defined as a function that takes a link prediction function $f$, a temporal graph $\mathcal{G}(t_i)$, and a potential future edge addition event $\varepsilon_i$ as input. It outputs a subset of the events from the original input graph as a counterfactual explanation.
+A counterfactual explainer for the future link prediction task $ex$ is defined as a function that takes a link prediction function $f$, a temporal graph $\mathcal{G}(t_i)$, and a potential future link $\varepsilon_i$ as input. It outputs a subset of the events from the original input graph as a counterfactual explanation.
 
 \begin{equation}
     \label{e_Explainer}
     ex: \{f, \mathcal{G}(t_i), \varepsilon_i\} \rightarrow \bigcup_{k = 0}^{|\mathcal{G}(t_i) \setminus \varepsilon_i|} {\mathcal{G}(t_i) \setminus \varepsilon_i \choose k}
 \end{equation}
 
-This definition constrains the output of the explainer to any combination of past events, following the notation in \cite{stanley_enumerative_1986}.
+The definition constrains the output of the explainer to any combination of past events. This definition follows the notation in \cite{stanley_enumerative_1986} for representing the set of all permutations of a particular size $k$.
 
 \subsection{Objectives of the Explainer}
 \label{s_ProblemFormulation_Objectives}
@@ -71,7 +71,7 @@ Explaining future link predictions using counterfactual examples entails two pri
         \label{e_minCFExampleSize}
         \argmin_{\mathcal{X}_{\varepsilon_i}^j \in \Psi_{\varepsilon_i}} |\mathcal{X}_{\varepsilon_i}^j|
     \end{equation}
-    where the function $|\mathcal{X}_{\varepsilon_i}^j|$ returns the number of events that are part of the explanation $\mathcal{X}_{\varepsilon_i}^j$.
+    where the function $|\mathcal{X}_{\varepsilon_i}^j|$ returns the number of events that comprise explanation $\mathcal{X}_{\varepsilon_i}^j$.
 \end{enumerate}
 
 %To pursue the first objective, the explainer $ex(\cdot)$ should maximize the following expression:
@@ -87,8 +87,6 @@ Explaining future link predictions using counterfactual examples entails two pri
 \subsection{Problem Statement}
 \label{s_ProblemFormulation_ProblemStatement}
 
-In summary, this thesis proposes explaining predictions made by \glspl{tgnn} in the context of future link prediction using counterfactual examples.
+In summary, this thesis proposes explaining predictions made by \glspl{tgnn} in the context of future link prediction using counterfactual explanations. Given a \gls{ctdg} $\mathcal{G} = \{\varepsilon_{1}, \varepsilon_{2}, ...\}$, and a trained temporal graph model $f$, an explainer $ex$ provides explanations for why the model predicts either the occurrence or non-occurrence of a future link $\varepsilon_{i}$. The explanation consists of a subset of the past events $\mathcal{X}_{\varepsilon_{i}}$.
 
-Given a \gls{ctdg} $\mathcal{G} = \{\varepsilon_{1}, \varepsilon_{2}, ...\}$, and a trained temporal graph model $f$, an explainer $ex$ provides explanations for why the model predicts either the occurrence or non-occurrence of a future link $\varepsilon_{i}$. The explanation consists of a subset of the past events $\mathcal{X}_{\varepsilon_{i}}$.
-
-The primary objectives of an explainer are two-fold: maximizing the number of cases in which it successfully identifies a counterfactual example while concurrently minimizing the complexity of the explanation.
+The primary objectives of a counterfactual explainer are two-fold: maximizing the number of cases in which it successfully identifies a counterfactual example while concurrently minimizing the complexity of the explanation.

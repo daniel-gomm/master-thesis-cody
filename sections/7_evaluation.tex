@@ -2,7 +2,7 @@
 \label{s_Evaluation}
 % Decide whether this should be a chapter for the entire evaluation including setup and description of datasets baselines etc. or if this should focus on results and discussion only (then rename and move the rest to the methodology chapter)
 
-This chapter provides a comprehensive evaluation of \gls{greedycf} and \gls{cftgnn}. To assess the performance and effectiveness of both methods in various scenarios, a series of experiments is conducted in different settings and on multiple datasets, comparing the proposed approach against baseline explanation methods. To set the stage, the next chapter outlines the experimental setup (Section \ref{s_Evaluation_Setup}), which is followed by an overview of the results of this evaluation in Section \ref{s_Evaluation_Results}.
+This chapter provides a comprehensive evaluation of \gls{greedycf} and \gls{cftgnn}. To assess the performance and effectiveness of both methods in various scenarios, a series of experiments is conducted in different settings and on multiple datasets, comparing the proposed approach against a baseline explanation method. This chapter is partitioned into two sections. First, Section \ref{s_Evaluation_Setup} details the experimental setup for the evaluation. Second, Section \ref{s_Evaluation_Results} presents and discusses the results of the experiments.
 
 \subsection{Experimental Setup}
 \label{s_Evaluation_Setup}
@@ -14,11 +14,14 @@ To ensure the replicability of the results of the evaluation, this section detai
 
 The explainers are evaluated on three different datasets. These datasets are diverse in terms of their size, their structure, and the temporal density of events, aiming to verify that the explanation approaches perform similarly on different datasets.
 
-The first two datasets come from an online social network among students of the University of California at Irvine \cite{kunegis_konect_2013}. The first of these is called UCI-Messages. In this dynamic graph, nodes represent students and edges private messages between these students. No node or edge features are included in the dataset. 
+The first two datasets come from an online social network among students of the University of California at Irvine (UCI) \cite{kunegis_konect_2013}. The first of these is called UCI-Messages. In this dynamic graph, nodes represent students and edges private messages between these students. No node or edge features are included in the dataset. 
 
 UCI-Forums is the second dataset. The nodes in this bipartite dynamic graph represent students and forums. Each edge represents a post that a student made to a specific forum. Neither the nodes nor the edges are associated with features.
 
-The third dataset is called Wikipedia \cite{kumar_predicting_2019} and consists of events representing edits of Wikipedia pages. The edits are represented as attributed links between users and pages. Thus, the dataset is a bipartite graph. It encompasses the 1,000 most edited pages and a total of 8,227 users. The edges are associated with attributes that represent a conversion of the edit text into a \gls{liwc} \cite{pennebaker_linguistic_2001} feature vector. This vector encodes a quantitative analysis of the text in the page edit \cite{pennebaker_linguistic_2001}.
+The third dataset is called Wikipedia \cite{kumar_predicting_2019} and consists of events representing edits of Wikipedia pages. The edits are represented as attributed links between users and pages. Thus, the dataset is a bipartite graph. It encompasses the 1,000 most edited pages and a total of 8,227 users. The edges are associated with attributes that represent the associated edit texts as \gls{liwc} \cite{pennebaker_linguistic_2001} feature vector. This vector encodes a quantitative analysis of the text in the page edit \cite{pennebaker_linguistic_2001}.
+
+Table \ref{t_Datasets} provides an overview of these datasets. The two datasets from the UCI social network cover a longer timespan and are more sparse in the temporal dimension than the Wikipedia dataset. Another substantial difference is that, in contrast to the other datasets, the UCI-Messages dataset contains a relatively high number of unique edges compared to the number of total edges. 
+Furthermore, the UCI-Messages and UCI-Forums datasets have proportionally fewer multi-edges compared to the Wikipedia dataset. An aspect that these datasets have in common is that they exclusively consist of addition events, meaning there only exist node and edge addition events but no deletion or feature update events.
 
 \begin{table}[ht]
     \centering
@@ -35,16 +38,13 @@ The third dataset is called Wikipedia \cite{kumar_predicting_2019} and consists 
     \label{t_Datasets}
 \end{table}
 
-Table \ref{t_Datasets} provides an overview of these datasets. The two datasets from the UCI social network cover a longer timespan and are more sparse in the temporal dimension than the Wikipedia dataset. Another major difference is that, in contrast to the other datasets, the UCI-Messages dataset contains a relatively high number of unique edges compared to the number of total edges. 
-Furthermore, the UCI-Messages and UCI-Forums datasets have proportionally fewer multi-edges compared to the Wikipedia dataset.
-
 
 \subsubsection{Target Model}
 \label{s_Evaluation_Setup_TargetModel}
 
-All experiments are conducted on the dynamic graph model \gls{tgn} \cite{rossi_temporal_2020}. \gls{tgn} is a \gls{tgnn} for \glspl{ctdg} that was introduced in Section \ref{s_Background_TGNNs}. \gls{tgn} is used as the target model since it is popular within research \cite{souza_provably_2022} and achieves state-of-the-art performance in different tasks on dynamic graphs \cite{rossi_temporal_2020, souza_provably_2022}. To its users, the model mostly remains a black-box with little transparency over what leads to a specific prediction.
+The target model that is explained in all experiments is the dynamic graph model \gls{tgn} \cite{rossi_temporal_2020}. \gls{tgn} is a \gls{tgnn} for \glspl{ctdg} that was introduced in Section \ref{s_Background_TGNNs}. \gls{tgn} is used as the target model since it is popular within research \cite{souza_provably_2022} and achieves state-of-the-art performance in different tasks on dynamic graphs \cite{rossi_temporal_2020, souza_provably_2022}. To its users, the model mostly remains a black-box with little transparency over what leads to a specific prediction.
 
-For the experiments, the \gls{tgn} model is configured with a \gls{gru} as memory updater, graph attention as an embedding module, last message aggregation, and the identity memory function. This corresponds to the \gls{tgn}-attn configuration presented as the default configuration by the authors of \gls{tgn} \cite{rossi_temporal_2020}. The batch size is set to 32 events. For training, the data is split into four temporal sections. The first $20\%$ of the data are processed but not used for training. The following $50\%$ of events are used in the training. The remaining $30\%$ are split into equal parts for validation and testing. After training for $30$ epochs with early stopping on the model accuracy, the \gls{tgn} model archives a high average precision, as shown in Table \ref{t_TGNTrainingPerformance}.
+For the experiments, the \gls{tgn} model is configured with a \gls{gru} as memory updater, graph attention as an embedding module, last message aggregation, and the identity memory function. This corresponds to the \gls{tgn}-attn configuration presented as the default configuration by the authors of \gls{tgn} \cite{rossi_temporal_2020}. The batch size is set to 32 events. For training, the data is split into four temporal sections. The first $20\%$ of the data are processed but not used for training. The following $50\%$ of events are used in the training. The remaining $30\%$ are split into equal parts for validation and testing purposes. After training for $30$ epochs with early stopping on the model accuracy, the \gls{tgn} model archives a high average precision, as shown in Table \ref{t_TGNTrainingPerformance}.
 
 \begin{table}[ht]
     \small
@@ -57,7 +57,7 @@ For the experiments, the \gls{tgn} model is configured with a \gls{gru} as memor
          TGN-attn& 85.86 & 83.26 & 92.72&  89.39&  97.80& 97.39\\
     \hline
     \end{tabular}
-    \caption{Average Precision in percent for future link prediction on the UCI-Messages, UCI-Forums, and Wikipedia dataset.}
+    \caption{Average Precision in percent for future link prediction on the UCI-Messages, UCI-Forums, and Wikipedia dataset. The inductive setting consists of predicting future links between nodes that are seen during training. The transductive setting consists of predicting future links between nodes that are not observed during training.}
     \label{t_TGNTrainingPerformance}
 \end{table}
 
