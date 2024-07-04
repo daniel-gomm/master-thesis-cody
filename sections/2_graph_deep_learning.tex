@@ -163,16 +163,18 @@ Deep learning methods that apply permutation invariant functions to graph data a
 
 %% What should I put here exactly? I want to bridge the gap to graph neural networks so it should introduce only the necessary background for that, thus maybe first state the general principle and then what that means for gnns? General principle: "exposing the regularities in data through unified geometric principles that can be applied throughout a wide spectrum of applications"
 
+\newpage
+
 \subsection{Graph Neural Networks}
 \label{s_Background_GNNs}
 
 
 % Transition from GDL to GNNs. Make a short introduction and later cover how the GDL principles show in the different architectures.
 
-\glspl{gnn} are potent tools for various learning tasks on relational and interaction data. They find successful applications in many domains, including drug discovery \cite{dauparas_robust_2022}, weather forecasting \cite{lam_graphcast_2022}, and reasoning on knowledge graphs \cite{huang_few-shot_2022}. 
+\acrfull{gnn} are potent tools for various learning tasks on relational and interaction data. They find successful applications in many domains, including drug discovery \cite{dauparas_robust_2022}, weather forecasting \cite{lam_graphcast_2022}, and reasoning on knowledge graphs \cite{huang_few-shot_2022}. 
 %They achieve this performance by exploiting the properties of the permutation group underlying graph data \cite{bronstein_geometric_2021}.
 
-\newpage
+
 
 The applications of \glspl{gnn} are diverse, but their tasks are often similar. The common tasks are node, edge, and graph classification, node regression, and link prediction \cite{wu_comprehensive_2021, zhou_graph_2020}.
 \begin{itemize}
@@ -194,6 +196,8 @@ In the encoder-decoder framework, the so-called encoder component produces repre
     \label{d_Embedding}
     An \textbf{Embedding} is a numerical representation $h_v$ for a node $v \in V$ in a graph. This representation commonly consists of one or more numerical scalars, vectors, or matrices \cite{kazemi_representation_2019}. For a given graph $G = (V, E)$, node embeddings are the result of the embedding function $emb: (v, G) \mapsto h_v \hspace{5pt} \forall v \in V$.
 \end{definition}
+
+\newpage
 
 Embeddings should capture and represent the structural and semantic information of nodes, facilitating information propagation, integrating local and global features, and enabling effective graph reasoning in downstream tasks \cite{goyal_graph_2018}. The embedding function $emb$ should thus provide similar embeddings for nodes that have structurally and semantically similar neighborhoods and similar features \cite{goyal_graph_2018, bronstein_geometric_2021}.
 %The embedding function $emb$ should thus preserve a sense of proximity defined on the graph \cite{goyal_graph_2018}. 
@@ -249,7 +253,7 @@ Following Bronstein et al. \cite{bronstein_geometric_2021}, most \gls{gnn} archi
         h_{v_i}^l = \sigma(h_{v_i}^{l-1}, \underset{v_j \in N_1(v_i)}{\oplus} a(h_{v_i}^{l-1}, h_{v_j}^{l-1}) \varphi(h_{v_j}^{l-1}))
     \end{equation}
 
-    \item \textbf{Message-passing-based \glspl{gnn}:} This architecture treats graph layers as a message-passing process in which nodes directly pass information to their neighbors \cite{wu_comprehensive_2021}. A learnable message function $\varphi$ passes information between neighboring nodes \cite{bronstein_geometric_2021}.
+    \item \textbf{Message-passing-based \glspl{gnn}:} This architecture treats graph layers as message-passing process in which nodes directly pass information to their neighbors \cite{wu_comprehensive_2021}. A learnable message function $\varphi$ passes information between neighboring nodes \cite{bronstein_geometric_2021}.
     \begin{equation}
         h_{v_i}^l = \sigma(h_{v_i}^{l-1}, \underset{v_j \in N_1(v_i)}{\oplus} \varphi(h_{v_i}^{l-1}, h_{v_j}^{l-1}))
     \end{equation}
@@ -280,11 +284,11 @@ $\sigma$ is combined with a temporal update function $\phi$ to obtain the update
 \begin{equation}
     h_{v_i}^l(t) = \phi(h_{v_i}^{l}(t-1), \sigma(h_{v_i}^{l-1}(t), \underset{v_j \in N_1(v_i, t)}{\oplus} \psi(h_{v_j}^{l-1}(t), \cdots)))
 \end{equation}
-The temporal update function $\phi$ encodes the temporal dynamics by including the node representation of the last timestep $h_{v_i}^{l}(t-1)$ \cite{longa_graph_2023}. The update function might take additional arguments, depending on the specific implementation. There exist various implementations of the permutation invariant function $\sigma$ and the temporal update function $\phi$ \cite{longa_graph_2023}. These include using self-attention \cite{sankar_dysat_2020}, or \glspl{rnn} like a \gls{gru} \cite{you_roland_2022}.
+The temporal update function $\phi$ encodes the temporal dynamics by including the node representation of the last timestep $h_{v_i}^{l}(t-1)$ \cite{longa_graph_2023}. The update function might take additional arguments, depending on the implementation. There exist various implementations of the permutation invariant function $\sigma$ and the temporal update function $\phi$ \cite{longa_graph_2023}. These include using self-attention \cite{sankar_dysat_2020}, or \glspl{rnn} like a \gls{gru} \cite{you_roland_2022}.
 
 \newpage
 
-\subsubsection{Temporal Graph Neural Networks for Continuous-Time Dynamic Graphs}
+\subsubsection{Temporal Graph Neural Networks for Continuous-Time\\ Dynamic Graphs}
 \label{s_tgnns_for_ctdgs}
 \gls{tgnn} methods for \glspl{ctdg} effectively handle sequences of events by integrating methods that refresh a node's representation whenever an event related to that node takes place \cite{longa_graph_2023}. They represent an extension of static \glspl{gnn} because they merge and aggregate node representations within temporal neighborhoods \cite{longa_graph_2023}.
 
